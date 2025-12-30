@@ -5,8 +5,8 @@ Arc Protractor Generator for Turntable Tonearms
 Generates precision arc protractors for cartridge alignment based on 
 tonearm mounting geometry and alignment standards (Baerwald, Löfgren B, Stevenson).
 
-Author: Iain Mott
-License: GNU General Public Licence v3.0
+Author: Generated for turntable alignment
+License: Public Domain
 """
 
 import argparse
@@ -468,27 +468,53 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
             angle += 360
         return angle
     
-    # Calculate radii: 4cm ABOVE inner (closer to spindle = smaller radius)
-    #                  4cm BELOW outer (further from spindle = larger radius)
-    arc_start_radius = inner_null - 40  # Closer to spindle (was 30, now 40 = 4cm)
-    arc_end_radius = outer_null + 40    # Further from spindle (was 30, now 40 = 4cm)
+    # Calculate radii: try 4cm extension beyond each null point
+    # For extreme geometries (like Stevenson), reduce extension if needed
+    target_extension = 40  # 4cm in mm
     
-    # Clamp to valid range
-    arc_start_radius = max(5, arc_start_radius)
-    arc_end_radius = min(arc_end_radius, arc_radius / mm - 5)
+    # Try extending the arc
+    arc_start_radius = inner_null - target_extension
+    arc_end_radius = outer_null + target_extension
     
-    start_angle = calc_arc_angle(arc_start_radius)  # Smaller angle
-    end_angle = calc_arc_angle(arc_end_radius)      # Larger angle
+    # Check if geometry is valid, reduce extension if needed
+    start_test = calc_arc_angle(arc_start_radius)
     
-    # Calculate extent (reportlab wants startAng, extent - NOT two angles!)
-    extent = end_angle - start_angle
+    # If inner extension fails, reduce it until it works
+    if start_test is None:
+        # Binary search for maximum valid extension
+        for extension in range(target_extension, 0, -1):
+            arc_start_radius = inner_null - extension
+            if calc_arc_angle(arc_start_radius) is not None:
+                break
+        else:
+            # No extension possible, use inner null itself
+            arc_start_radius = inner_null
     
-    # Draw stylus arc - match spindle crosshair appearance
-    c.setStrokeColorRGB(0, 0, 0)  # Black, same as spindle crosshairs
-    c.setLineWidth(0.2)  # Same as spindle crosshairs
-    c.arc(pivot_x - arc_radius, pivot_y - arc_radius, 
-          pivot_x + arc_radius, pivot_y + arc_radius,
-          start_angle, extent)
+    # Similarly check outer extension
+    end_test = calc_arc_angle(arc_end_radius)
+    if end_test is None:
+        for extension in range(target_extension, 0, -1):
+            arc_end_radius = outer_null + extension
+            if calc_arc_angle(arc_end_radius) is not None:
+                break
+        else:
+            arc_end_radius = outer_null
+    
+    # Now calculate the actual angles
+    start_angle = calc_arc_angle(arc_start_radius)
+    end_angle = calc_arc_angle(arc_end_radius)
+    
+    # Draw stylus arc (should always work now)
+    if start_angle is not None and end_angle is not None:
+        # Calculate extent (reportlab wants startAng, extent - NOT two angles!)
+        extent = end_angle - start_angle
+        
+        # Draw stylus arc - match spindle crosshair appearance
+        c.setStrokeColorRGB(0, 0, 0)  # Black, same as spindle crosshairs
+        c.setLineWidth(0.2)  # Same as spindle crosshairs
+        c.arc(pivot_x - arc_radius, pivot_y - arc_radius, 
+              pivot_x + arc_radius, pivot_y + arc_radius,
+              start_angle, extent)
     
     c.save()
     

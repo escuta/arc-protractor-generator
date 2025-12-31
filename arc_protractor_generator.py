@@ -113,11 +113,10 @@ def calculate_null_points(pivot_to_spindle, alignment_type='baerwald',
         outer_null = 116.60
         
     elif alignment_type == 'stevenson':
-        # Stevenson: Nulls at groove limits
-        # Prioritizes low distortion at record end (outer groove)
-        # Note: Some sources use modified Stevenson with different outer null
-        inner_null = r_i  # At innermost groove
-        outer_null = r_o  # At outermost groove
+        # Stevenson: Inner null at innermost groove, outer null optimized for inner groove performance
+        # Prioritizes low distortion at record end (inner grooves)
+        inner_null = 60.325  # At innermost groove (IEC standard)
+        outer_null = 117.42  # Standard Stevenson outer null
     
     else:
         raise ValueError(f"Unknown alignment type: {alignment_type}")
@@ -228,10 +227,10 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.drawString(text_start_x, height - 80*mm, f"Overhang:")
     c.drawString(text_start_x + 40*mm, height - 80*mm, f"{overhang:.3f} mm")
     
-    c.drawString(text_start_x, height - 86*mm, f"Inner Null:")
+    c.drawString(text_start_x, height - 86*mm, f"Inner Null Point:")
     c.drawString(text_start_x + 40*mm, height - 86*mm, f"{inner_null:.3f} mm")
     
-    c.drawString(text_start_x, height - 92*mm, f"Outer Null:")
+    c.drawString(text_start_x, height - 92*mm, f"Outer Null Point:")
     c.drawString(text_start_x + 40*mm, height - 92*mm, f"{outer_null:.3f} mm")
     
     c.drawString(text_start_x, height - 98*mm, f"Offset Angle:")
@@ -437,8 +436,8 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.line(0, 0, x_outer, y_outer)
     
     # Draw grids at both null points (AFTER radius lines so they stay black)
-    draw_alignment_grid(inner_null, "Inner Null")
-    draw_alignment_grid(outer_null, "Outer Null")
+    draw_alignment_grid(inner_null, "Inner Null Point")
+    draw_alignment_grid(outer_null, "Outer Null Point")
     
     # Draw arc LAST so it's visible on top of everything
     # Arc should START 4cm above inner null (closer to spindle)
@@ -601,15 +600,15 @@ Common tonearm mounting distances:
     if args.show_all:
         print(f"\nAlignment calculations for {args.pivot_to_spindle}mm mounting distance:")
         print(f"Groove radii: {args.inner_groove:.2f} - {args.outer_groove:.2f}mm\n")
-        print(f"{'Alignment':<20} {'Inner Null':<12} {'Outer Null':<12} {'Eff. Length':<13} {'Overhang':<10} {'Offset°'}")
-        print("-" * 85)
+        print(f"{'Alignment':<20} {'Inner Null Point':<17} {'Outer Null Point':<17} {'Eff. Length':<13} {'Overhang':<10} {'Offset°'}")
+        print("-" * 95)
         
         for alignment_key in ['baerwald', 'lofgren_b', 'stevenson']:
             inner_null, outer_null, eff_len, overhang, offset = \
                 calculate_null_points(args.pivot_to_spindle, alignment_key, 
                                      args.inner_groove, args.outer_groove)
             name = ALIGNMENTS[alignment_key]['name']
-            print(f"{name:<20} {inner_null:>10.3f}mm {outer_null:>10.3f}mm {eff_len:>11.3f}mm {overhang:>8.3f}mm {offset:>7.3f}")
+            print(f"{name:<20} {inner_null:>15.3f}mm {outer_null:>15.3f}mm {eff_len:>11.3f}mm {overhang:>8.3f}mm {offset:>7.3f}")
         print()
         return
     

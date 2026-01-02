@@ -1,0 +1,267 @@
+<style>
+.protractor-form {
+    max-width: 600px;
+    margin: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    margin-top: 3px;
+}
+
+.btn-generate {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.btn-generate:hover {
+    background-color: #218838;
+}
+
+.btn-generate:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.alert {
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #28a745;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<div class="protractor-form">
+    <h3>Generate Your Arc Protractor</h3>
+    
+    <form id="protractorForm">
+        <div class="form-group">
+            <label for="pivot_distance">Pivot-to-Spindle Distance (mm) *</label>
+            <input type="number" id="pivot_distance" name="pivot_distance" 
+                   step="0.1" min="150" max="300" required
+                   placeholder="e.g., 215.5">
+            <small>Measure from tonearm pivot to spindle center</small>
+        </div>
+
+        <div class="form-group">
+            <label for="alignment">Alignment Geometry</label>
+            <select id="alignment" name="alignment">
+                <option value="baerwald">Baerwald (Löfgren A) - Default</option>
+                <option value="lofgren_b">Löfgren B</option>
+                <option value="stevenson">Stevenson</option>
+            </select>
+            <small>Baerwald: best all-round | Löfgren B: full-side listening | Stevenson: inner groove focus</small>
+        </div>
+
+        <div class="form-group">
+            <label for="turntable_name">Turntable Name (optional)</label>
+            <input type="text" id="turntable_name" name="turntable_name" 
+                   placeholder="e.g., SME 3009 S2 Improved">
+            <small>Will appear on the protractor</small>
+        </div>
+
+        <div class="form-group">
+            <label for="paper_size">Paper Size</label>
+            <select id="paper_size" name="paper_size">
+                <option value="A4">A4 (210 × 297 mm)</option>
+                <option value="US">US Letter (8.5 × 11 in)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label style="cursor: pointer; user-select: none;">
+                <input type="checkbox" id="advanced_toggle" style="margin-right: 5px;"> 
+                <strong>Advanced Options</strong> (Custom groove radii)
+            </label>
+        </div>
+
+        <div id="advanced_options" style="display: none !important;">
+            <div class="form-group">
+                <label for="inner_groove">Inner Groove Radius (mm)</label>
+                <input type="number" id="inner_groove" name="inner_groove" 
+                       step="0.1" min="40" max="100" placeholder="60.325">
+                <small>IEC default: 60.325mm | 7" singles: ~57mm | 10" 78s: ~60mm</small>
+            </div>
+
+            <div class="form-group">
+                <label for="outer_groove">Outer Groove Radius (mm)</label>
+                <input type="number" id="outer_groove" name="outer_groove" 
+                       step="0.1" min="80" max="160" placeholder="146.05">
+                <small>IEC default: 146.05mm | 7" singles: ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn-generate" id="generateBtn">
+                Generate Protractor
+            </button>
+        </div>
+    </form>
+
+    <div id="message" style="display: none;"></div>
+</div>
+
+<script>
+(function() {
+    const form = document.getElementById('protractorForm');
+    const advancedToggle = document.getElementById('advanced_toggle');
+    const advancedOptions = document.getElementById('advanced_options');
+    const messageDiv = document.getElementById('message');
+    const generateBtn = document.getElementById('generateBtn');
+
+    // Debug: Check if elements are found
+    if (!advancedToggle || !advancedOptions) {
+        console.error('Advanced options elements not found');
+        return;
+    }
+
+    // Toggle advanced options - use both 'change' and 'click' events for better compatibility
+    function toggleAdvancedOptions() {
+        if (advancedToggle.checked) {
+            advancedOptions.style.setProperty('display', 'block', 'important');
+            console.log('Advanced options opened');
+        } else {
+            advancedOptions.style.setProperty('display', 'none', 'important');
+            console.log('Advanced options closed');
+        }
+    }
+
+    advancedToggle.addEventListener('change', toggleAdvancedOptions);
+    advancedToggle.addEventListener('click', toggleAdvancedOptions);
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Show loading state
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = 'Generating...<span class="loading-spinner"></span>';
+        
+        messageDiv.style.display = 'none';
+        messageDiv.className = 'alert';
+
+        // Collect form data
+        const formData = new FormData();
+        formData.append('pivot_distance', document.getElementById('pivot_distance').value);
+        formData.append('alignment', document.getElementById('alignment').value);
+        formData.append('turntable_name', document.getElementById('turntable_name').value);
+        formData.append('paper_size', document.getElementById('paper_size').value);
+        
+        if (advancedToggle.checked) {
+            const innerGroove = document.getElementById('inner_groove').value;
+            const outerGroove = document.getElementById('outer_groove').value;
+            if (innerGroove) formData.append('inner_groove', innerGroove);
+            if (outerGroove) formData.append('outer_groove', outerGroove);
+        }
+
+        // Send to backend (make sure generate-protractor.php is in /protractor/ directory)
+        fetch('/protractor/generate-protractor.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || 'Generation failed');
+                });
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create blob URL and open in new tab
+            const url = window.URL.createObjectURL(blob);
+            
+            // Open PDF in new tab
+            const newTab = window.open(url, '_blank');
+            
+            // If popup was blocked, show download link
+            if (!newTab) {
+                messageDiv.className = 'alert alert-info';
+                messageDiv.innerHTML = 'Popup blocked! <a href="' + url + '" target="_blank">Click here to open your protractor</a>';
+                messageDiv.style.display = 'block';
+            } else {
+                // Show success message
+                messageDiv.className = 'alert alert-success';
+                messageDiv.innerHTML = '✓ Protractor generated successfully! PDF opened in new tab.';
+                messageDiv.style.display = 'block';
+            }
+            
+            // Clean up URL after 1 minute
+            setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+
+            // Reset button
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = 'Generate Protractor';
+        })
+        .catch(error => {
+            // Show error message
+            messageDiv.className = 'alert alert-error';
+            messageDiv.innerHTML = '✗ Error: ' + error.message;
+            messageDiv.style.display = 'block';
+
+            // Reset button
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = 'Generate Protractor';
+        });
+    });
+})();
+</script>

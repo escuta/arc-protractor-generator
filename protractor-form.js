@@ -60,15 +60,13 @@
             const alignment = alignmentSelect.value;
             
             if (alignment === 'custom') {
-                // Clear null points for custom entry
-                innerNullInput.value = '';
-                outerNullInput.value = '';
-                innerNullInput.setAttribute('required', 'required');
-                outerNullInput.setAttribute('required', 'required');
-                innerNullInput.readOnly = false;
-                outerNullInput.readOnly = false;
+                // In Custom mode, don't touch the null points
+                // User has either manually entered them or edited auto-calculated values
+                // Only ensure they have the right styling
                 innerNullInput.style.backgroundColor = '';
                 outerNullInput.style.backgroundColor = '';
+                innerNullInput.setAttribute('required', 'required');
+                outerNullInput.setAttribute('required', 'required');
             } else {
                 // Use standard null points for standard alignments
                 const calculation = NULL_POINT_CALCULATIONS[alignment];
@@ -82,19 +80,43 @@
                     outerNullInput.value = parseFloat(nullPoints.outer);
                     innerNullInput.removeAttribute('required');
                     outerNullInput.removeAttribute('required');
-                    innerNullInput.readOnly = true;
-                    outerNullInput.readOnly = true;
+                    // Gray background indicates auto-calculated values
                     innerNullInput.style.backgroundColor = '#f0f0f0';
                     outerNullInput.style.backgroundColor = '#f0f0f0';
                 }
             }
         }
+        
+        // Switch to Custom mode when user edits null points
+        function handleNullPointEdit() {
+            if (alignmentSelect.value !== 'custom') {
+                alignmentSelect.value = 'custom';
+                innerNullInput.style.backgroundColor = '';
+                outerNullInput.style.backgroundColor = '';
+                innerNullInput.setAttribute('required', 'required');
+                outerNullInput.setAttribute('required', 'required');
+            }
+        }
 
+        // Handle alignment dropdown changes
+        function handleAlignmentChange() {
+            // If user explicitly selects Custom from dropdown, clear the null fields
+            if (alignmentSelect.value === 'custom') {
+                innerNullInput.value = '';
+                outerNullInput.value = '';
+            }
+            updateNullPoints();
+        }
+        
         // Attach listeners
-        alignmentSelect.addEventListener('change', updateNullPoints);
+        alignmentSelect.addEventListener('change', handleAlignmentChange);
         pivotDistanceInput.addEventListener('input', updateNullPoints);
         innerGrooveInput.addEventListener('input', updateNullPoints);
         outerGrooveInput.addEventListener('input', updateNullPoints);
+        
+        // Switch to Custom when user manually edits null points
+        innerNullInput.addEventListener('input', handleNullPointEdit);
+        outerNullInput.addEventListener('input', handleNullPointEdit);
 
         // Initialize null points on page load
         updateNullPoints();

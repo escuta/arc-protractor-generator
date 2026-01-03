@@ -1,5 +1,21 @@
 /* Arc Protractor Form Styling - Narrow Layout with Side Descriptions */
 
+/* Force article title to match body text alignment */
+.page-header h1,
+.com-content-article .page-header h1,
+.item-page .page-header h1 {
+    text-align: left !important;
+}
+
+/* Mobile specific - match title padding to site-grid padding (20px at 1199px breakpoint) */
+@media only screen and (max-width: 1199px) {
+    .page-header,
+    .page-header h1 {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
 .protractor-form {
     max-width: 900px !important;
     margin: 20px 0 !important;

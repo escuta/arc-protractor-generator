@@ -1,0 +1,124 @@
+/* Arc Protractor Form Styling - Narrow Layout with Side Descriptions */
+
+.protractor-form {
+    max-width: 900px !important;
+    margin: 20px 0 !important;
+}
+
+.protractor-form .form-group {
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
+    column-gap: 15px !important;
+    row-gap: 3px !important;
+    align-items: start !important;
+    margin-bottom: 15px !important;
+    padding: 0 8px !important;
+}
+
+.protractor-form .form-group label {
+    grid-column: 1 / 2 !important;
+    display: block !important;
+    font-weight: 400 !important;
+    margin-bottom: 0 !important;
+    color: #333 !important;
+    font-size: 0.95em !important;
+}
+
+.protractor-form .form-group input,
+.protractor-form .form-group select {
+    grid-column: 1 / 2 !important;
+    width: 100% !important;
+    padding: 10px 12px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 3px !important;
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+    font-size: 1em !important;
+    transition: border-color 0.2s !important;
+    height: 42px !important;
+    background-color: #ffffff !important;
+}
+
+.protractor-form .form-group input:focus,
+.protractor-form .form-group select:focus {
+    outline: none !important;
+    border-color: #001B4C !important;
+}
+
+.protractor-form .form-group small {
+    grid-column: 2 / 3 !important;
+    grid-row: 2 / 3 !important;
+    display: block !important;
+    color: #777 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    align-self: center !important;
+}
+
+.protractor-form .btn-generate {
+    grid-column: 1 / 2 !important;
+    background-color: #001B4C !important;
+    color: white !important;
+    padding: 12px 30px !important;
+    border: none !important;
+    border-radius: 3px !important;
+    cursor: pointer !important;
+    font-size: 1em !important;
+    font-weight: 400 !important;
+    font-family: inherit !important;
+    margin-top: 10px !important;
+    transition: background-color 0.2s !important;
+    width: auto !important;
+}
+
+.protractor-form .btn-generate:hover {
+    background-color: #003366 !important;
+}
+
+.protractor-form .btn-generate:disabled {
+    background-color: #999 !important;
+    cursor: not-allowed !important;
+}
+
+.protractor-form .alert {
+    padding: 14px 16px !important;
+    margin: 20px 0 !important;
+    border-radius: 3px !important;
+    font-size: 0.95em !important;
+    grid-column: 1 / -1 !important;
+}
+
+.protractor-form .alert-info {
+    background-color: #e3f2fd !important;
+    border: 1px solid #90caf9 !important;
+    color: #1565c0 !important;
+}
+
+.protractor-form .alert-error {
+    background-color: #ffebee !important;
+    border: 1px solid #ef9a9a !important;
+    color: #c62828 !important;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 768px) {
+    .protractor-form .form-group {
+        grid-template-columns: 1fr !important;
+        gap: 5px !important;
+    }
+    
+    .protractor-form .form-group label,
+    .protractor-form .form-group input,
+    .protractor-form .form-group select,
+    .protractor-form .form-group small {
+        grid-column: 1 / 2 !important;
+    }
+    
+    .protractor-form .form-group small {
+        grid-row: auto !important;
+        margin-top: 4px !important;
+        padding-top: 0 !important;
+    }
+}

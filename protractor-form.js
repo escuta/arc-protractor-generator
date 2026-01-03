@@ -62,9 +62,6 @@
             if (alignment === 'custom') {
                 // In Custom mode, don't touch the null points
                 // User has either manually entered them or edited auto-calculated values
-                // Only ensure they have the right styling
-                innerNullInput.style.backgroundColor = '';
-                outerNullInput.style.backgroundColor = '';
                 innerNullInput.setAttribute('required', 'required');
                 outerNullInput.setAttribute('required', 'required');
             } else {
@@ -80,9 +77,6 @@
                     outerNullInput.value = parseFloat(nullPoints.outer);
                     innerNullInput.removeAttribute('required');
                     outerNullInput.removeAttribute('required');
-                    // Gray background indicates auto-calculated values
-                    innerNullInput.style.backgroundColor = '#f0f0f0';
-                    outerNullInput.style.backgroundColor = '#f0f0f0';
                 }
             }
         }
@@ -91,8 +85,6 @@
         function handleNullPointEdit() {
             if (alignmentSelect.value !== 'custom') {
                 alignmentSelect.value = 'custom';
-                innerNullInput.style.backgroundColor = '';
-                outerNullInput.style.backgroundColor = '';
                 innerNullInput.setAttribute('required', 'required');
                 outerNullInput.setAttribute('required', 'required');
             }

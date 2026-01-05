@@ -55,7 +55,7 @@ def calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_nu
         outer_null: Outer null point radius (mm)
     
     Returns:
-        tuple: (effective_length, overhang, offset_angle)
+        tuple: (effective_length, overhang, offset_angle, tracking_angle_midpoint)
     """
     
     d = pivot_to_spindle
@@ -68,9 +68,15 @@ def calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_nu
     
     # Calculate offset angle using the standard approximation
     # β ≈ arcsin((r₂ - r₁) / (2L))
+    # This is the geometric angle between cartridge and tonearm tube
     offset_angle = math.degrees(math.asin((r2 - r1) / (2 * effective_length)))
     
-    return effective_length, overhang, offset_angle
+    # Calculate tracking angle at midpoint (what VinylEngine calls "offset angle")
+    # This is the angle at the average radius between null points
+    r_midpoint = (r1 + r2) / 2
+    tracking_angle_midpoint = math.degrees(math.asin(r_midpoint / effective_length))
+    
+    return effective_length, overhang, offset_angle, tracking_angle_midpoint
 
 
 def calculate_null_points(pivot_to_spindle, alignment_type='baerwald', 
@@ -89,7 +95,7 @@ def calculate_null_points(pivot_to_spindle, alignment_type='baerwald',
         outer_groove: Outermost groove radius (mm)
     
     Returns:
-        tuple: (inner_null, outer_null, effective_length, overhang, offset_angle)
+        tuple: (inner_null, outer_null, effective_length, overhang, offset_angle, tracking_angle_midpoint)
     """
     
     r_i = inner_groove
@@ -134,7 +140,11 @@ def calculate_null_points(pivot_to_spindle, alignment_type='baerwald',
     # This is the angle between the cartridge centerline and the pivot-to-spindle line
     offset_angle = math.degrees(math.asin((outer_null - inner_null) / (2 * effective_length)))
     
-    return inner_null, outer_null, effective_length, overhang, offset_angle
+    # Calculate tracking angle at midpoint (VinylEngine's "offset angle")
+    r_midpoint = (inner_null + outer_null) / 2
+    tracking_angle_midpoint = math.degrees(math.asin(r_midpoint / effective_length))
+    
+    return inner_null, outer_null, effective_length, overhang, offset_angle, tracking_angle_midpoint
 
 def draw_arc_protractor(pivot_to_spindle, alignment='baerwald', 
                        output_file=None, custom_nulls=None,
@@ -157,11 +167,11 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     if custom_nulls:
         inner_null, outer_null = custom_nulls
         # Use proper geometric solver
-        effective_length, overhang, offset_angle = \
+        effective_length, overhang, offset_angle, tracking_angle_midpoint = \
             calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_null)
         alignment_name = f"Custom ({inner_null:.2f}/{outer_null:.2f}mm)"
     else:
-        inner_null, outer_null, effective_length, overhang, offset_angle = \
+        inner_null, outer_null, effective_length, overhang, offset_angle, tracking_angle_midpoint = \
             calculate_null_points(pivot_to_spindle, alignment, inner_groove, outer_groove)
         alignment_name = ALIGNMENTS[alignment]['name']
     
@@ -234,11 +244,24 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.drawString(text_start_x + 40*mm, height - 92*mm, f"{outer_null:.3f} mm")
     
     c.drawString(text_start_x, height - 98*mm, f"Offset Angle:")
-    c.drawString(text_start_x + 40*mm, height - 98*mm, f"{offset_angle:.3f}°")
+    offset_str = f"{offset_angle:.3f}°"
+    c.drawString(text_start_x + 40*mm, height - 98*mm, offset_str)
+    offset_width = c.stringWidth(offset_str, "Helvetica", 9)
+    c.setFont("Helvetica", 7)
+    c.drawString(text_start_x + 40*mm + offset_width + 1.5*mm, height - 98*mm, f"(cartridge to arm)")
+    c.setFont("Helvetica", 9)
+    
+    c.drawString(text_start_x, height - 104*mm, f"Tracking Angle:")
+    tracking_str = f"{tracking_angle_midpoint:.3f}°"
+    c.drawString(text_start_x + 40*mm, height - 104*mm, tracking_str)
+    tracking_width = c.stringWidth(tracking_str, "Helvetica", 9)
+    c.setFont("Helvetica", 7)
+    c.drawString(text_start_x + 40*mm + tracking_width + 1.5*mm, height - 104*mm, f"(at midpoint)")
+    c.setFont("Helvetica", 9)
     
     # Instructions - SAME font size and spacing as specs
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(text_start_x, height - 110*mm, "INSTRUCTIONS:")  # Adjusted from 108mm
+    c.drawString(text_start_x, height - 116*mm, "INSTRUCTIONS:")  # Adjusted for compact angle layout
     
     c.setFont("Helvetica", 9)
     instructions = [
@@ -253,7 +276,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         "7. Tighten when aligned"
     ]
     
-    y_pos = height - 118*mm  # Adjusted from 116mm
+    y_pos = height - 124*mm  # Adjusted to be below "INSTRUCTIONS:" header
     for line in instructions:
         c.drawString(text_start_x, y_pos, line)
         y_pos -= 6*mm
@@ -523,7 +546,8 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         'overhang': overhang,
         'inner_null': inner_null,
         'outer_null': outer_null,
-        'offset_angle': offset_angle
+        'offset_angle': offset_angle,
+        'tracking_angle_midpoint': tracking_angle_midpoint
     }
 
 def main():
@@ -600,15 +624,15 @@ Common tonearm mounting distances:
     if args.show_all:
         print(f"\nAlignment calculations for {args.pivot_to_spindle}mm mounting distance:")
         print(f"Groove radii: {args.inner_groove:.2f} - {args.outer_groove:.2f}mm\n")
-        print(f"{'Alignment':<20} {'Inner Null Point':<17} {'Outer Null Point':<17} {'Eff. Length':<13} {'Overhang':<10} {'Offset°'}")
-        print("-" * 95)
+        print(f"{'Alignment':<20} {'Inner Null':<12} {'Outer Null':<12} {'Eff. Length':<13} {'Overhang':<10} {'Offset°':<9} {'Track°'}")
+        print("-" * 105)
         
         for alignment_key in ['baerwald', 'lofgren_b', 'stevenson']:
-            inner_null, outer_null, eff_len, overhang, offset = \
+            inner_null, outer_null, eff_len, overhang, offset, tracking = \
                 calculate_null_points(args.pivot_to_spindle, alignment_key, 
                                      args.inner_groove, args.outer_groove)
             name = ALIGNMENTS[alignment_key]['name']
-            print(f"{name:<20} {inner_null:>15.3f}mm {outer_null:>15.3f}mm {eff_len:>11.3f}mm {overhang:>8.3f}mm {offset:>7.3f}")
+            print(f"{name:<20} {inner_null:>10.3f}mm {outer_null:>10.3f}mm {eff_len:>11.3f}mm {overhang:>8.3f}mm {offset:>7.3f} {tracking:>7.3f}")
         print()
         return
     
@@ -633,7 +657,8 @@ Common tonearm mounting distances:
         print(f"  Overhang:          {specs['overhang']:.3f} mm")
         print(f"  Inner Null Point:  {specs['inner_null']:.3f} mm")
         print(f"  Outer Null Point:  {specs['outer_null']:.3f} mm")
-        print(f"  Offset Angle:      {specs['offset_angle']:.3f}°")
+        print(f"  Offset Angle:      {specs['offset_angle']:.3f}° (cartridge to arm)")
+        print(f"  Tracking Angle:    {specs['tracking_angle_midpoint']:.3f}° (at midpoint)")
         print("\n⚠  IMPORTANT: Print at 100% scale and verify measurements!")
         
     except Exception as e:

@@ -439,7 +439,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     # These help verify that grids are perpendicular to spindle radius
     # Radial lines to null points
     c.setStrokeColorRGB(0, 0, 0)
-    c.setLineWidth(0.15)
+    c.setLineWidth(0.3)
     
     # Helper function to calculate null point position
     def calc_null_position(radius_from_spindle):
@@ -533,7 +533,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         
         # Draw stylus arc
         c.setStrokeColorRGB(0, 0, 0)
-        c.setLineWidth(0.15)
+        c.setLineWidth(0.3)
         c.arc(pivot_x - arc_radius, pivot_y - arc_radius, 
               pivot_x + arc_radius, pivot_y + arc_radius,
               start_angle, extent)

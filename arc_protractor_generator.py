@@ -271,7 +271,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         "4. Place on turntable",
         "5. Lower stylus onto arc",
         "6. At each null point:",
-        "   - Stylus tip on black dot",
+        "   - Stylus tip centred in circle",
         "   - Cartridge parallel to grid lines",
         "7. Tighten when aligned"
     ]
@@ -368,12 +368,12 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         groove_tangent_y = -x_pos
         grid_angle = math.degrees(math.atan2(groove_tangent_y, groove_tangent_x))
         
-        # Draw simple black dot for stylus position marker (BEFORE rotating)
+        # Draw small circle for stylus positioning (BEFORE rotating)
         c.setStrokeColorRGB(0, 0, 0)  # Black
-        c.setFillColorRGB(0, 0, 0)    # Black fill
         c.setLineWidth(0.3)
-        # Small filled circle at exact stylus position - 1mm diameter
-        c.circle(x_pos, y_pos, 0.5*mm, stroke=1, fill=1)
+        # Small outlined circle at exact stylus position - stylus goes INSIDE the circle
+        # 1.5mm radius (3mm diameter) for easy visibility and positioning
+        c.circle(x_pos, y_pos, 1.5*mm, stroke=1, fill=0)
         
         # Draw grid for cartridge alignment - BLACK not blue
         c.setStrokeColorRGB(0, 0, 0)  # Black (was blue)
@@ -437,9 +437,9 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Draw diagnostic radius lines FIRST (so grids render on top with full black color)
     # These help verify that grids are perpendicular to spindle radius
-    # Match spindle crosshair appearance
-    c.setStrokeColorRGB(0, 0, 0)  # Black, same as spindle crosshairs
-    c.setLineWidth(0.2)  # Same as spindle crosshairs
+    # Radial lines to null points
+    c.setStrokeColorRGB(0, 0, 0)
+    c.setLineWidth(0.15)
     
     # Helper function to calculate null point position
     def calc_null_position(radius_from_spindle):
@@ -531,9 +531,9 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         # Calculate extent (reportlab wants startAng, extent - NOT two angles!)
         extent = end_angle - start_angle
         
-        # Draw stylus arc - match spindle crosshair appearance
-        c.setStrokeColorRGB(0, 0, 0)  # Black, same as spindle crosshairs
-        c.setLineWidth(0.2)  # Same as spindle crosshairs
+        # Draw stylus arc
+        c.setStrokeColorRGB(0, 0, 0)
+        c.setLineWidth(0.15)
         c.arc(pivot_x - arc_radius, pivot_y - arc_radius, 
               pivot_x + arc_radius, pivot_y + arc_radius,
               start_angle, extent)

@@ -271,7 +271,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         "4. Place on turntable",
         "5. Lower stylus onto arc",
         "6. At each null point:",
-        "   - Stylus tip centred in circle",
+        "   - Stylus tip on black dot",
         "   - Cartridge parallel to grid lines",
         "7. Tighten when aligned"
     ]
@@ -368,12 +368,12 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         groove_tangent_y = -x_pos
         grid_angle = math.degrees(math.atan2(groove_tangent_y, groove_tangent_x))
         
-        # Draw small circle for stylus positioning (BEFORE rotating)
+        # Draw filled dot for stylus positioning (BEFORE rotating)
         c.setStrokeColorRGB(0, 0, 0)  # Black
+        c.setFillColorRGB(0, 0, 0)    # Black fill
         c.setLineWidth(0.3)
-        # Small outlined circle at exact stylus position - stylus goes INSIDE the circle
-        # 1.5mm radius (3mm diameter) for easy visibility and positioning
-        c.circle(x_pos, y_pos, 1.5*mm, stroke=1, fill=0)
+        # Small filled circle at exact stylus position - 1mm diameter
+        c.circle(x_pos, y_pos, 0.5*mm, stroke=1, fill=1)
         
         # Draw grid for cartridge alignment - BLACK not blue
         c.setStrokeColorRGB(0, 0, 0)  # Black (was blue)

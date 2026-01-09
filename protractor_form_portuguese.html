@@ -1,267 +1,99 @@
-<style>
-.protractor-form {
-    max-width: 600px;
-    margin: 20px 0;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-group small {
-    display: block;
-    color: #666;
-    margin-top: 3px;
-}
-
-.btn-generate {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.btn-generate:hover {
-    background-color: #218838;
-}
-
-.btn-generate:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-.alert {
-    padding: 12px;
-    margin: 15px 0;
-    border-radius: 4px;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    border: 1px solid #bee5eb;
-    color: #0c5460;
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #28a745;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 10px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
-
-<div class="protractor-form">
-    <h3>Gere Seu Gabarito de Arco</h3>
-    
-    <form id="protractorForm">
-        <div class="form-group">
-            <label for="pivot_distance">Distância Pivô-Eixo (mm) *</label>
-            <input type="number" id="pivot_distance" name="pivot_distance" 
-                   step="0.1" min="150" max="300" required
-                   placeholder="ex: 215.5">
-            <small>Meça do pivô do braço até o centro do eixo</small>
-        </div>
-
-        <div class="form-group">
-            <label for="alignment">Geometria de Alinhamento</label>
-            <select id="alignment" name="alignment">
-                <option value="baerwald">Baerwald (Löfgren A) - Padrão</option>
-                <option value="lofgren_b">Löfgren B</option>
-                <option value="stevenson">Stevenson</option>
-            </select>
-            <small>Baerwald: melhor uso geral | Löfgren B: lados completos | Stevenson: foco em sulcos internos</small>
-        </div>
-
-        <div class="form-group">
-            <label for="turntable_name">Nome do Toca-discos (opcional)</label>
-            <input type="text" id="turntable_name" name="turntable_name" 
-                   placeholder="ex: SME 3009 S2 Improved">
-            <small>Aparecerá no gabarito</small>
-        </div>
-
-        <div class="form-group">
-            <label for="paper_size">Tamanho do Papel</label>
-            <select id="paper_size" name="paper_size">
-                <option value="A4">A4 (210 × 297 mm)</option>
-                <option value="US">US Letter (8.5 × 11 pol)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label style="cursor: pointer; user-select: none;">
-                <input type="checkbox" id="advanced_toggle" style="margin-right: 5px;"> 
-                <strong>Opções Avançadas</strong> (Raios de sulco personalizados)
-            </label>
-        </div>
-
-        <div id="advanced_options" style="display: none !important;">
-            <div class="form-group">
-                <label for="inner_groove">Raio do Sulco Interno (mm)</label>
-                <input type="number" id="inner_groove" name="inner_groove" 
-                       step="0.1" min="40" max="100" placeholder="60.325">
-                <small>IEC padrão: 60.325mm | Compactos 7": ~57mm | 10" 78s: ~60mm</small>
-            </div>
-
-            <div class="form-group">
-                <label for="outer_groove">Raio do Sulco Externo (mm)</label>
-                <input type="number" id="outer_groove" name="outer_groove" 
-                       step="0.1" min="80" max="160" placeholder="146.05">
-                <small>IEC padrão: 146.05mm | Compactos 7": ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <button type="submit" class="btn-generate" id="generateBtn">
-                Gerar Gabarito
-            </button>
-        </div>
-    </form>
-
-    <div id="message" style="display: none;"></div>
+<p>Este formulário gera gabaritos de alinhamento de arco de precisão para o alinhamento de cápsulas fonográficas em toca-discos com braços pivotantes. Basta medir a distância pivot-spindle do seu toca-discos, inserir o valor e quaisquer outras configurações desejadas no formulário, clicar em "Gerar Gabarito" e imprimir seu PDF personalizado em escala de 100%.</p>
+<div class="protractor-form"><form id="protractorForm">
+<div class="form-group"><label for="pivot_distance">Distância Pivot-Spindle (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.01" type="number" placeholder="ex: 215.5"> <small>Meça do pivot do braço até o centro do spindle</small></div>
+<div class="form-group"><label for="alignment">Geometria de Alinhamento</label><select id="alignment" name="alignment">
+<option value="baerwald">Baerwald (Löfgren A)</option>
+<option value="lofgren_b">Löfgren B</option>
+<option value="stevenson">Stevenson</option>
+<option value="custom">Personalizado</option>
+</select><small>Baerwald: melhor uso geral | Löfgren B: audição de lado completo | Stevenson: foco em sulcos internos</small></div>
+<div class="form-group"><label for="inner_null">Ponto Nulo Interno (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.01" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
+<div class="form-group"><label for="outer_null">Ponto Nulo Externo (mm)</label> <input id="outer_null" max="160" min="80" name="outer_null" step="0.01" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
+<div class="form-group"><label for="inner_groove">Raio de Sulco Interno (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.01" type="number" value="60.33"> <small>IEC padrão: 60.325mm | Compactos 7": ~57mm | 10" 78s: ~60mm</small></div>
+<div class="form-group"><label for="outer_groove">Raio de Sulco Externo (mm)</label> <input id="outer_groove" max="160" min="80" name="outer_groove" required="" step="0.01" type="number" value="146.05"> <small>IEC padrão: 146.05mm | Compactos 7": ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small></div>
+<div class="form-group"><label for="turntable_name">Nome do Toca-Discos (opcional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="ex: SME 3009 S2 Improved"> <small>Aparecerá no gabarito</small></div>
+<div class="form-group"><label for="paper_size">Tamanho do Papel</label><select id="paper_size" name="paper_size">
+<option value="A4">A4 (210 × 297 mm)</option>
+<option value="US">US Letter (8.5 × 11 pol)</option>
+</select></div>
+<div class="form-group"><button id="generateBtn" class="btn-generate" type="submit" data-button-text="Gerar Gabarito" data-loading-text="Gerando..." data-success-text="✓ Gabarito gerado com sucesso! PDF aberto em nova aba." data-blocked-text="Popup bloqueado! &lt;a href='#' target='_blank'&gt;Clique aqui para abrir seu gabarito&lt;/a&gt;"> Gerar Gabarito </button></div>
+</form>
+<div id="message" style="display: none;"></div>
 </div>
-
-<script>
-(function() {
-    const form = document.getElementById('protractorForm');
-    const advancedToggle = document.getElementById('advanced_toggle');
-    const advancedOptions = document.getElementById('advanced_options');
-    const messageDiv = document.getElementById('message');
-    const generateBtn = document.getElementById('generateBtn');
-
-    // Debug: Check if elements are found
-    if (!advancedToggle || !advancedOptions) {
-        console.error('Elementos de opções avançadas não encontrados');
-        return;
-    }
-
-    // Toggle advanced options - use both 'change' and 'click' events for better compatibility
-    function toggleAdvancedOptions() {
-        if (advancedToggle.checked) {
-            advancedOptions.style.setProperty('display', 'block', 'important');
-            console.log('Opções avançadas abertas');
-        } else {
-            advancedOptions.style.setProperty('display', 'none', 'important');
-            console.log('Opções avançadas fechadas');
-        }
-    }
-
-    advancedToggle.addEventListener('change', toggleAdvancedOptions);
-    advancedToggle.addEventListener('click', toggleAdvancedOptions);
-
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Show loading state
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = 'Gerando...<span class="loading-spinner"></span>';
-        
-        messageDiv.style.display = 'none';
-        messageDiv.className = 'alert';
-
-        // Collect form data
-        const formData = new FormData();
-        formData.append('pivot_distance', document.getElementById('pivot_distance').value);
-        formData.append('alignment', document.getElementById('alignment').value);
-        formData.append('turntable_name', document.getElementById('turntable_name').value);
-        formData.append('paper_size', document.getElementById('paper_size').value);
-        
-        if (advancedToggle.checked) {
-            const innerGroove = document.getElementById('inner_groove').value;
-            const outerGroove = document.getElementById('outer_groove').value;
-            if (innerGroove) formData.append('inner_groove', innerGroove);
-            if (outerGroove) formData.append('outer_groove', outerGroove);
-        }
-
-        // Send to backend (certifique-se de que generate-protractor.php está no diretório /protractor/)
-        fetch('/protractor/generate-protractor.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error || 'Falha na geração');
-                });
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // Create blob URL and open in new tab
-            const url = window.URL.createObjectURL(blob);
-            
-            // Open PDF in new tab
-            const newTab = window.open(url, '_blank');
-            
-            // If popup was blocked, show download link
-            if (!newTab) {
-                messageDiv.className = 'alert alert-info';
-                messageDiv.innerHTML = 'Popup bloqueado! <a href="' + url + '" target="_blank">Clique aqui para abrir seu gabarito</a>';
-                messageDiv.style.display = 'block';
-            } else {
-                // Show success message
-                messageDiv.className = 'alert alert-success';
-                messageDiv.innerHTML = '✓ Gabarito gerado com sucesso! PDF aberto em nova aba.';
-                messageDiv.style.display = 'block';
-            }
-            
-            // Clean up URL after 1 minute
-            setTimeout(() => window.URL.revokeObjectURL(url), 60000);
-
-            // Reset button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = 'Gerar Gabarito';
-        })
-        .catch(error => {
-            // Show error message
-            messageDiv.className = 'alert alert-error';
-            messageDiv.innerHTML = '✗ Erro: ' + error.message;
-            messageDiv.style.display = 'block';
-
-            // Reset button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = 'Gerar Gabarito';
-        });
-    });
-})();
-</script>
+<hr>
+<h3>Como Funciona</h3>
+<p>O gerador calcula os pontos nulos ideais (onde o erro de rastreamento = 0) com base na geometria do seu braço e no método de alinhamento escolhido. Ele cria um PDF com um arco correspondente ao caminho da agulha e grades de alinhamento posicionadas nos pontos nulos.</p>
+<p><a href="images/blog/SME_3009_S2_Improved_Early.pdf" target="_blank" rel="noopener">Ver exemplo de PDF</a></p>
+<h3>Entendendo o Overhang</h3>
+<p><strong>Overhang</strong> é a distância que a agulha se estende além do spindle do toca-discos quando o braço está posicionado reto através do disco. O overhang correto garante que a agulha rastreie o arco calculado e se alinhe adequadamente em ambos os pontos nulos. O gabarito permite ajustar tanto o overhang (posição frontal/traseira) quanto o ângulo de offset (rotação da cápsula) simultaneamente, alinhando a agulha com o arco e as linhas de grade em ambos os pontos nulos.</p>
+<h3>Como Usar o Gabarito</h3>
+<ol>
+<li><strong>Posicione o Gabarito:</strong> Centralize o gabarito no spindle do seu toca-discos, garantindo que seja o correto para a distância pivot-spindle do seu braço.</li>
+<li><strong>Afrouxe a Cápsula:</strong> Afrouxe levemente os parafusos de montagem da cápsula para que ela possa deslizar para frente e para trás no headshell.</li>
+<li><strong>Alinhe no Ponto Nulo Externo:</strong>
+<ul>
+<li>Abaixe a agulha sobre a grade de alinhamento externa</li>
+<li>Ajuste a posição frontal/traseira da cápsula (overhang) para que a ponta da agulha fique precisamente sobre o arco</li>
+<li>Simultaneamente, ajuste o ângulo da cápsula para que seu corpo ou cantilever fique paralelo às linhas de grade</li>
+</ul>
+</li>
+<li><strong>Verifique o Ponto Nulo Interno:</strong>
+<ul>
+<li>Mova o braço para a grade de alinhamento interna sem mover o gabarito</li>
+<li>Se a agulha não se alinhar perfeitamente com o arco e a grade, ajuste novamente a posição da cápsula</li>
+</ul>
+</li>
+<li><strong>Itere:</strong> Retorne ao ponto externo e verifique novamente o alinhamento, depois volte ao ponto interno, repetindo até que a agulha rastreie o arco e se alinhe com ambas as grades perfeitamente.</li>
+<li><strong>Aperte:</strong> Uma vez alinhado em ambos os pontos, aperte cuidadosamente os parafusos de montagem sem deslocar a posição da cápsula.</li>
+</ol>
+<h3>Instruções de Impressão</h3>
+<ol>
+<li>Imprima o PDF em escala de <strong>100%</strong> (SEM dimensionamento/ajustar à página)</li>
+<li>Verifique se a barra de escala de 100mm mede exatamente 100mm com uma régua</li>
+<li>Use o gabarito para alinhar sua cápsula seguindo os passos acima</li>
+</ol>
+<h3>Geometrias de Alinhamento</h3>
+<p><strong>Baerwald (Löfgren A) - Padrão</strong></p>
+<ul>
+<li>Minimiza o erro máximo de rastreamento</li>
+<li>Melhor para audição de uso geral</li>
+<li>Pontos nulos: 66.04mm, 120.90mm (para sulcos padrão IEC)</li>
+</ul>
+<p><strong>Löfgren B</strong></p>
+<ul>
+<li>Minimiza o erro RMS (médio) de rastreamento</li>
+<li>Melhor para audição de lado completo</li>
+<li>Pontos nulos: 70.29mm, 116.60mm (para sulcos padrão IEC)</li>
+</ul>
+<p><strong>Stevenson</strong></p>
+<ul>
+<li>Minimiza o erro de rastreamento nos sulcos internos</li>
+<li>Melhor para discos com seções longas de sulcos internos</li>
+<li>Pontos nulos: 60.33mm, 117.42mm (para sulcos padrão IEC)</li>
+</ul>
+<h3>Alinhamento para Outros Formatos de Disco</h3>
+<p>Embora o formulário use por padrão os raios de sulco de LP de 12" padrão (IEC 60.325-146.05mm), ele pode gerar gabaritos para outros formatos usando parâmetros de sulco personalizados.</p>
+<h4>Compactos Simples de 7" 45 RPM</h4>
+<p>Compactos simples de 7" usam as mesmas especificações de sulco que LPs, mas com dimensões menores. Os raios de sulco típicos são 57-58mm (interno) a 88-90mm (externo). Use a mesma geometria de alinhamento dos LPs.</p>
+<h4>Discos de 10" 78 RPM</h4>
+<p>Os raios de sulco típicos são aproximadamente 60-62mm (interno) a 117-120mm (externo). Para gravações de faixa única (uma música por lado), o alinhamento Löfgren B é recomendado, pois minimiza o erro médio de rastreamento em todo o lado.</p>
+<h4>Discos de 12" 78 RPM</h4>
+<p>Os raios de sulco típicos são aproximadamente 60-65mm (interno) a 135-145mm (externo). Estes eram normalmente usados para música clássica e gravações orquestrais que exigiam maior tempo de reprodução.</p>
+<p><em>Nota: Os discos de 78 RPM são anteriores à padronização IEC e os raios de sulco variavam de acordo com o fabricante e a época. Os valores acima são aproximações típicas.</em></p>
+<h3>Exemplos de Distâncias de Montagem de Braços</h3>
+<p><strong>Braços 9":</strong></p>
+<ul>
+<li>SME 3009 S2 Improved (antigo): 215.7 mm</li>
+<li>SME 3009 S2 Improved (recente): 213.25 mm</li>
+<li>Technics SL-1200: 215.0 mm</li>
+<li>Rega RB300: 222.0 mm</li>
+<li>Audio-Technica AT-LP120: 215.0 mm</li>
+<li>Braços Pro-Ject 8.6": 200.0 mm</li>
+</ul>
+<p><strong>Braços 12":</strong></p>
+<ul>
+<li>SME M2-12R: 295.6 mm</li>
+</ul>
+<h3>Script Python</h3>
+<p>Este formulário web utiliza o script Python de código aberto gerador de gabarito de arco. O script está disponível para download se você preferir executá-lo localmente a partir da linha de comando:</p>
+<p><a href="https://github.com/escuta/arc-protractor-generator/releases/latest/download/arc_protractor_generator.py">Baixar Script Python</a> | <a href="https://github.com/escuta/arc-protractor-generator">Ver no GitHub</a></p>

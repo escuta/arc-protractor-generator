@@ -1,267 +1,99 @@
-<style>
-.protractor-form {
-    max-width: 600px;
-    margin: 20px 0;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-group small {
-    display: block;
-    color: #666;
-    margin-top: 3px;
-}
-
-.btn-generate {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.btn-generate:hover {
-    background-color: #218838;
-}
-
-.btn-generate:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-.alert {
-    padding: 12px;
-    margin: 15px 0;
-    border-radius: 4px;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    border: 1px solid #bee5eb;
-    color: #0c5460;
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #28a745;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 10px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
-
-<div class="protractor-form">
-    <h3>Generate Your Arc Protractor</h3>
-    
-    <form id="protractorForm">
-        <div class="form-group">
-            <label for="pivot_distance">Pivot-to-Spindle Distance (mm) *</label>
-            <input type="number" id="pivot_distance" name="pivot_distance" 
-                   step="0.1" min="150" max="300" required
-                   placeholder="e.g., 215.5">
-            <small>Measure from tonearm pivot to spindle center</small>
-        </div>
-
-        <div class="form-group">
-            <label for="alignment">Alignment Geometry</label>
-            <select id="alignment" name="alignment">
-                <option value="baerwald">Baerwald (Löfgren A) - Default</option>
-                <option value="lofgren_b">Löfgren B</option>
-                <option value="stevenson">Stevenson</option>
-            </select>
-            <small>Baerwald: best all-round | Löfgren B: full-side listening | Stevenson: inner groove focus</small>
-        </div>
-
-        <div class="form-group">
-            <label for="turntable_name">Turntable Name (optional)</label>
-            <input type="text" id="turntable_name" name="turntable_name" 
-                   placeholder="e.g., SME 3009 S2 Improved">
-            <small>Will appear on the protractor</small>
-        </div>
-
-        <div class="form-group">
-            <label for="paper_size">Paper Size</label>
-            <select id="paper_size" name="paper_size">
-                <option value="A4">A4 (210 × 297 mm)</option>
-                <option value="US">US Letter (8.5 × 11 in)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label style="cursor: pointer; user-select: none;">
-                <input type="checkbox" id="advanced_toggle" style="margin-right: 5px;"> 
-                <strong>Advanced Options</strong> (Custom groove radii)
-            </label>
-        </div>
-
-        <div id="advanced_options" style="display: none !important;">
-            <div class="form-group">
-                <label for="inner_groove">Inner Groove Radius (mm)</label>
-                <input type="number" id="inner_groove" name="inner_groove" 
-                       step="0.1" min="40" max="100" placeholder="60.325">
-                <small>IEC default: 60.325mm | 7" singles: ~57mm | 10" 78s: ~60mm</small>
-            </div>
-
-            <div class="form-group">
-                <label for="outer_groove">Outer Groove Radius (mm)</label>
-                <input type="number" id="outer_groove" name="outer_groove" 
-                       step="0.1" min="80" max="160" placeholder="146.05">
-                <small>IEC default: 146.05mm | 7" singles: ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <button type="submit" class="btn-generate" id="generateBtn">
-                Generate Protractor
-            </button>
-        </div>
-    </form>
-
-    <div id="message" style="display: none;"></div>
+<p>This form generates precision arc protractors for aligning phono cartridges on turntables with pivoting tonearms. Simply measure your turntable's pivot-to-spindle distance, enter the value and any other desired settings in the form, click "Generate Protractor", and print your custom protractor PDF at 100% scale.</p>
+<div class="protractor-form"><form id="protractorForm">
+<div class="form-group"><label for="pivot_distance">Pivot-to-Spindle Distance (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.01" type="number" placeholder="e.g., 215.5"> <small>Measure from tonearm pivot to spindle centre</small></div>
+<div class="form-group"><label for="alignment">Alignment Geometry</label><select id="alignment" name="alignment">
+<option value="baerwald">Baerwald (Löfgren A)</option>
+<option value="lofgren_b">Löfgren B</option>
+<option value="stevenson">Stevenson</option>
+<option value="custom">Custom</option>
+</select><small>Baerwald: best all-round | Löfgren B: full-side listening | Stevenson: inner groove focus</small></div>
+<div class="form-group"><label for="inner_null">Inner Null Point (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.01" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
+<div class="form-group"><label for="outer_null">Outer Null Point (mm)</label> <input id="outer_null" max="160" min="80" name="outer_null" step="0.01" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
+<div class="form-group"><label for="inner_groove">Inner Groove Radius (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.01" type="number" value="60.33"> <small>IEC default: 60.325mm | 7" singles: ~57mm | 10" 78s: ~60mm</small></div>
+<div class="form-group"><label for="outer_groove">Outer Groove Radius (mm)</label> <input id="outer_groove" max="160" min="80" name="outer_groove" required="" step="0.01" type="number" value="146.05"> <small>IEC default: 146.05mm | 7" singles: ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small></div>
+<div class="form-group"><label for="turntable_name">Turntable Name (optional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="e.g., SME 3009 S2 Improved"> <small>Will appear on the alignment protractor</small></div>
+<div class="form-group"><label for="paper_size">Paper Size</label><select id="paper_size" name="paper_size">
+<option value="A4">A4 (210 × 297 mm)</option>
+<option value="US">US Letter (8.5 × 11 in)</option>
+</select></div>
+<div class="form-group"><button id="generateBtn" class="btn-generate" type="submit" data-button-text="Generate Protractor" data-loading-text="Generating..." data-success-text="✓ Protractor generated successfully! PDF opened in new tab." data-blocked-text="Popup blocked! &lt;a href='#' target='_blank'&gt;Click here to open your protractor&lt;/a&gt;"> Generate Protractor </button></div>
+</form>
+<div id="message" style="display: none;"></div>
 </div>
-
-<script>
-(function() {
-    const form = document.getElementById('protractorForm');
-    const advancedToggle = document.getElementById('advanced_toggle');
-    const advancedOptions = document.getElementById('advanced_options');
-    const messageDiv = document.getElementById('message');
-    const generateBtn = document.getElementById('generateBtn');
-
-    // Debug: Check if elements are found
-    if (!advancedToggle || !advancedOptions) {
-        console.error('Advanced options elements not found');
-        return;
-    }
-
-    // Toggle advanced options - use both 'change' and 'click' events for better compatibility
-    function toggleAdvancedOptions() {
-        if (advancedToggle.checked) {
-            advancedOptions.style.setProperty('display', 'block', 'important');
-            console.log('Advanced options opened');
-        } else {
-            advancedOptions.style.setProperty('display', 'none', 'important');
-            console.log('Advanced options closed');
-        }
-    }
-
-    advancedToggle.addEventListener('change', toggleAdvancedOptions);
-    advancedToggle.addEventListener('click', toggleAdvancedOptions);
-
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Show loading state
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = 'Generating...<span class="loading-spinner"></span>';
-        
-        messageDiv.style.display = 'none';
-        messageDiv.className = 'alert';
-
-        // Collect form data
-        const formData = new FormData();
-        formData.append('pivot_distance', document.getElementById('pivot_distance').value);
-        formData.append('alignment', document.getElementById('alignment').value);
-        formData.append('turntable_name', document.getElementById('turntable_name').value);
-        formData.append('paper_size', document.getElementById('paper_size').value);
-        
-        if (advancedToggle.checked) {
-            const innerGroove = document.getElementById('inner_groove').value;
-            const outerGroove = document.getElementById('outer_groove').value;
-            if (innerGroove) formData.append('inner_groove', innerGroove);
-            if (outerGroove) formData.append('outer_groove', outerGroove);
-        }
-
-        // Send to backend (make sure generate-protractor.php is in /protractor/ directory)
-        fetch('/protractor/generate-protractor.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error || 'Generation failed');
-                });
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // Create blob URL and open in new tab
-            const url = window.URL.createObjectURL(blob);
-            
-            // Open PDF in new tab
-            const newTab = window.open(url, '_blank');
-            
-            // If popup was blocked, show download link
-            if (!newTab) {
-                messageDiv.className = 'alert alert-info';
-                messageDiv.innerHTML = 'Popup blocked! <a href="' + url + '" target="_blank">Click here to open your protractor</a>';
-                messageDiv.style.display = 'block';
-            } else {
-                // Show success message
-                messageDiv.className = 'alert alert-success';
-                messageDiv.innerHTML = '✓ Protractor generated successfully! PDF opened in new tab.';
-                messageDiv.style.display = 'block';
-            }
-            
-            // Clean up URL after 1 minute
-            setTimeout(() => window.URL.revokeObjectURL(url), 60000);
-
-            // Reset button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = 'Generate Protractor';
-        })
-        .catch(error => {
-            // Show error message
-            messageDiv.className = 'alert alert-error';
-            messageDiv.innerHTML = '✗ Error: ' + error.message;
-            messageDiv.style.display = 'block';
-
-            // Reset button
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = 'Generate Protractor';
-        });
-    });
-})();
-</script>
+<hr>
+<h3>How It Works</h3>
+<p>The generator calculates the optimal null points (where tracking error = 0) based on your tonearm geometry and chosen alignment method. It creates a PDF with an arc matching your stylus path and alignment grids positioned at the null points.</p>
+<p><a href="images/blog/SME_3009_S2_Improved_Early.pdf" target="_blank" rel="noopener">See example PDF</a></p>
+<h3>Overhang</h3>
+<p><strong>Overhang</strong> is the distance the stylus extends beyond the turntable spindle when the tonearm is positioned straight across the record. Correct overhang ensures the stylus tracks the calculated arc and aligns properly at both null points. The protractor allows you to set both the overhang (forward/backward position) and offset angle (cartridge rotation) simultaneously by aligning the stylus with the arc and grid lines at both null points.</p>
+<h3>How to Use the Protractor</h3>
+<ol>
+<li><strong>Place the Protractor:</strong> Centre the protractor on your turntable spindle, ensuring it's the correct one for your tonearm's pivot-to-spindle distance.</li>
+<li><strong>Loosen Cartridge:</strong> Slightly loosen the cartridge mounting screws so the cartridge can slide forward and backward in the headshell.</li>
+<li><strong>Align at Outer Null Point:</strong>
+<ul>
+<li>Lower the stylus onto the outer alignment grid</li>
+<li>Adjust the cartridge's forward/backward position (overhang) so the stylus tip sits precisely on the arc</li>
+<li>Simultaneously adjust the cartridge's angle so its body or cantilever is parallel to the grid lines</li>
+</ul>
+</li>
+<li><strong>Check Inner Null Point:</strong>
+<ul>
+<li>Move the tonearm to the inner alignment grid without moving the protractor</li>
+<li>If the stylus doesn't align perfectly with the arc and grid, adjust the cartridge position again</li>
+</ul>
+</li>
+<li><strong>Iterate:</strong> Return to the outer point and recheck alignment, then back to the inner point, repeating until the stylus tracks the arc and aligns with both grids perfectly.</li>
+<li><strong>Tighten:</strong> Once aligned at both points, carefully tighten the mounting screws without shifting the cartridge position.</li>
+</ol>
+<h3>Printing Instructions</h3>
+<ol>
+<li>Print the PDF at <strong>100% scale</strong> (NO scaling/fit-to-page)</li>
+<li>Verify the 100mm scale bar measures exactly 100mm with a ruler</li>
+<li>Use the protractor to align your cartridge following the steps above</li>
+</ol>
+<h3>Alignment Geometries</h3>
+<p><strong>Baerwald (Löfgren A) - Default</strong></p>
+<ul>
+<li>Minimises maximum tracking error</li>
+<li>Best for general-purpose listening</li>
+<li>Null points: 66.04mm, 120.90mm (for IEC standard grooves)</li>
+</ul>
+<p><strong>Löfgren B</strong></p>
+<ul>
+<li>Minimises RMS (average) tracking error</li>
+<li>Best for full-side listening</li>
+<li>Null points: 70.29mm, 116.60mm (for IEC standard grooves)</li>
+</ul>
+<p><strong>Stevenson</strong></p>
+<ul>
+<li>Minimises tracking error at inner grooves</li>
+<li>Best for records with long inner groove sections</li>
+<li>Null points: 60.33mm, 117.42mm (for IEC standard grooves)</li>
+</ul>
+<h3>Alignment for Other Record Formats</h3>
+<p>While the form defaults to standard 12" LP groove radii (IEC 60.325-146.05mm), it can generate protractors for other formats using custom groove parameters.</p>
+<h4>7" 45 RPM Singles</h4>
+<p>7" singles use the same groove specifications as LPs but with smaller dimensions. Typical groove radii are 57-58mm (inner) to 88-90mm (outer). Use the same alignment geometry as for LPs.</p>
+<h4>10" 78 RPM Records</h4>
+<p>Typical groove radii are approximately 60-62mm (inner) to 117-120mm (outer). For single-track recordings (one song per side), Löfgren B alignment is recommended as it minimises average tracking error across the entire side.</p>
+<h4>12" 78 RPM Records</h4>
+<p>Typical groove radii are approximately 60-65mm (inner) to 135-145mm (outer). These were typically used for classical music and orchestral recordings requiring longer playing time.</p>
+<p><em>Note: 78 RPM records pre-date IEC standardization and groove radii varied by manufacturer and era. The values above are typical approximations.</em></p>
+<h3>Example Tonearm Mounting Distances</h3>
+<p><strong>9" tonearms:</strong></p>
+<ul>
+<li>SME 3009 S2 Improved (early): 215.7 mm</li>
+<li>SME 3009 S2 Improved (late): 213.25 mm</li>
+<li>Technics SL-1200: 215.0 mm</li>
+<li>Rega RB300: 222.0 mm</li>
+<li>Audio-Technica AT-LP120: 215.0 mm</li>
+<li>Pro-Ject 8.6" tonearms: 200.0 mm</li>
+</ul>
+<p><strong>12" tonearms:</strong></p>
+<ul>
+<li>SME M2-12R: 295.6 mm</li>
+</ul>
+<h3>Python Script</h3>
+<p>This web form uses the open-source arc protractor generator Python script. The script is available for download if you prefer to run it locally from the command line:</p>
+<p><a href="https://github.com/escuta/arc-protractor-generator/releases/latest/download/arc_protractor_generator.py">Download Python Script</a> | <a href="https://github.com/escuta/arc-protractor-generator">View on GitHub</a></p>

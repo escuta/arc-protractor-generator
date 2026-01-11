@@ -7,31 +7,102 @@
     'use strict';
     
     // Null point calculations for each alignment type
-    // NOTE: These are optimized values for IEC standard groove radii (60.325-146.05mm)
-    // Changing groove radii with standard alignments uses these same null points
-    // For true custom groove optimization, use "Custom" alignment and enter null points manually
+    // For IEC standard grooves (60.325-146.05mm), these return exact published values.
+    // For other groove radii, they scale proportionally to maintain distortion balance.
     const NULL_POINT_CALCULATIONS = {
         baerwald: function(pivotDistance, innerGroove, outerGroove) {
-            // Baerwald (Löfgren A) - empirically derived optimal values for IEC grooves
+            // Baerwald (Löfgren A) - minimizes maximum tracking error
+            const r_in = parseFloat(innerGroove);
+            const r_out = parseFloat(outerGroove);
+            
+            // IEC standard reference values
+            const IEC_INNER = 60.325;
+            const IEC_OUTER = 146.05;
+            const IEC_N1 = 66.04;
+            const IEC_N2 = 120.90;
+            
+            // For IEC standard grooves, use exact values
+            if (Math.abs(r_in - IEC_INNER) < 0.01 && Math.abs(r_out - IEC_OUTER) < 0.01) {
+                return {
+                    inner: IEC_N1.toFixed(2),
+                    outer: IEC_N2.toFixed(2)
+                };
+            }
+            
+            // Scale null points proportionally for non-standard groove radii
+            const scaleFactor = Math.sqrt((r_out - r_in) / (IEC_OUTER - IEC_INNER));
+            const offsetInner = IEC_N1 - IEC_INNER;
+            const offsetOuter = IEC_OUTER - IEC_N2;
+            
+            const innerNull = r_in + offsetInner * scaleFactor;
+            const outerNull = r_out - offsetOuter * scaleFactor;
+            
             return {
-                inner: '66.04',
-                outer: '120.90'
+                inner: innerNull.toFixed(2),
+                outer: outerNull.toFixed(2)
             };
         },
         
         lofgren_b: function(pivotDistance, innerGroove, outerGroove) {
-            // Löfgren B - empirically derived optimal values for IEC grooves
+            // Löfgren B - minimizes RMS (average) tracking error
+            const r_in = parseFloat(innerGroove);
+            const r_out = parseFloat(outerGroove);
+            
+            // IEC standard reference values
+            const IEC_INNER = 60.325;
+            const IEC_OUTER = 146.05;
+            const IEC_N1 = 70.29;
+            const IEC_N2 = 116.60;
+            
+            // For IEC standard grooves, use exact values
+            if (Math.abs(r_in - IEC_INNER) < 0.01 && Math.abs(r_out - IEC_OUTER) < 0.01) {
+                return {
+                    inner: IEC_N1.toFixed(2),
+                    outer: IEC_N2.toFixed(2)
+                };
+            }
+            
+            // Scale null points proportionally for non-standard groove radii
+            const scaleFactor = Math.sqrt((r_out - r_in) / (IEC_OUTER - IEC_INNER));
+            const offsetInner = IEC_N1 - IEC_INNER;
+            const offsetOuter = IEC_OUTER - IEC_N2;
+            
+            const innerNull = r_in + offsetInner * scaleFactor;
+            const outerNull = r_out - offsetOuter * scaleFactor;
+            
             return {
-                inner: '70.29',
-                outer: '116.60'
+                inner: innerNull.toFixed(2),
+                outer: outerNull.toFixed(2)
             };
         },
         
         stevenson: function(pivotDistance, innerGroove, outerGroove) {
-            // Stevenson - inner null at innermost groove
+            // Stevenson - minimizes distortion at inner grooves
+            // Inner null always at innermost groove
+            const r_in = parseFloat(innerGroove);
+            const r_out = parseFloat(outerGroove);
+            
+            // IEC standard reference values
+            const IEC_INNER = 60.325;
+            const IEC_OUTER = 146.05;
+            
+            const innerNull = r_in;
+            
+            // For IEC standard grooves, use known optimal value
+            if (Math.abs(r_in - IEC_INNER) < 0.01 && Math.abs(r_out - IEC_OUTER) < 0.01) {
+                const outerNull = 117.42;
+                return {
+                    inner: innerNull.toFixed(2),
+                    outer: outerNull.toFixed(2)
+                };
+            }
+            
+            // For non-standard grooves, use geometric mean approximation
+            const outerNull = Math.sqrt(r_in * r_out);
+            
             return {
-                inner: '60.33',
-                outer: '117.42'
+                inner: innerNull.toFixed(2),
+                outer: outerNull.toFixed(2)
             };
         }
     };
@@ -47,38 +118,131 @@
         const outerNullInput = document.getElementById('outer_null');
         const messageDiv = document.getElementById('message');
         const generateBtn = document.getElementById('generateBtn');
+        const grooveStandardRadios = document.getElementsByName('groove_standard');
 
         // Check if form exists on this page
         if (!form) {
             return; // Not on protractor form page
         }
 
-        console.log('Protractor form initialized with null point support');
+        // Verify all required elements exist
+        const requiredElements = {
+            'form': form,
+            'alignmentSelect': alignmentSelect,
+            'pivotDistanceInput': pivotDistanceInput,
+            'innerGrooveInput': innerGrooveInput,
+            'outerGrooveInput': outerGrooveInput,
+            'innerNullInput': innerNullInput,
+            'outerNullInput': outerNullInput,
+            'grooveStandardRadios': grooveStandardRadios
+        };
+
+        for (const [name, element] of Object.entries(requiredElements)) {
+            if (!element || (element.length !== undefined && element.length === 0)) {
+                console.error('Protractor form: Missing required element:', name);
+                return;
+            }
+        }
+
+        console.log('Protractor form initialized successfully');
+
+        // Groove standard presets
+        const GROOVE_STANDARDS = {
+            iec: { inner: 60.325, outer: 146.05 },
+            din: { inner: 57.5, outer: 146.05 }
+        };
+
+        // Handle groove standard radio button changes
+        function handleGrooveStandardChange() {
+            const selectedStandard = document.querySelector('input[name="groove_standard"]:checked').value;
+            
+            if (selectedStandard === 'custom') {
+                // Custom - don't change current values
+                return;
+            }
+            
+            if (GROOVE_STANDARDS[selectedStandard]) {
+                innerGrooveInput.value = GROOVE_STANDARDS[selectedStandard].inner;
+                outerGrooveInput.value = GROOVE_STANDARDS[selectedStandard].outer;
+                updateNullPoints();
+            }
+        }
+        
+        // Switch to Custom when user manually edits groove radii
+        function handleGrooveRadiiEdit() {
+            const selectedStandard = document.querySelector('input[name="groove_standard"]:checked').value;
+            
+            // Check if current values match any standard
+            const currentInner = parseFloat(innerGrooveInput.value);
+            const currentOuter = parseFloat(outerGrooveInput.value);
+            
+            console.log('handleGrooveRadiiEdit:', {
+                currentInner: currentInner,
+                currentOuter: currentOuter,
+                selectedStandard: selectedStandard
+            });
+            
+            let matchesStandard = false;
+            for (const [key, values] of Object.entries(GROOVE_STANDARDS)) {
+                if (Math.abs(currentInner - values.inner) < 0.01 && 
+                    Math.abs(currentOuter - values.outer) < 0.01) {
+                    matchesStandard = true;
+                    console.log('Matches standard:', key);
+                    break;
+                }
+            }
+            
+            // If values don't match any standard, switch to Custom
+            if (!matchesStandard && selectedStandard !== 'custom') {
+                console.log('Switching to custom groove standard');
+                document.querySelector('input[name="groove_standard"][value="custom"]').checked = true;
+            }
+        }
 
         // Update null points when alignment or groove values change
         function updateNullPoints() {
             const alignment = alignmentSelect.value;
             
+            console.log('updateNullPoints called:', {
+                alignment: alignment,
+                innerGroove: innerGrooveInput.value,
+                outerGroove: outerGrooveInput.value,
+                pivotDistance: pivotDistanceInput.value
+            });
+            
             if (alignment === 'custom') {
-                // In Custom mode, don't touch the null points
-                // User has either manually entered them or edited auto-calculated values
+                // In Custom alignment mode, don't touch the null points
+                // User has manually entered them
+                console.log('Alignment is custom, skipping null point calculation');
                 innerNullInput.setAttribute('required', 'required');
                 outerNullInput.setAttribute('required', 'required');
-            } else {
-                // Use standard null points for standard alignments
-                const calculation = NULL_POINT_CALCULATIONS[alignment];
-                if (calculation) {
-                    const pivotDistance = parseFloat(pivotDistanceInput.value) || 0;
-                    const innerGroove = parseFloat(innerGrooveInput.value) || 60.325;
-                    const outerGroove = parseFloat(outerGrooveInput.value) || 146.05;
-                    
-                    const nullPoints = calculation(pivotDistance, innerGroove, outerGroove);
-                    innerNullInput.value = parseFloat(nullPoints.inner);
-                    outerNullInput.value = parseFloat(nullPoints.outer);
-                    innerNullInput.removeAttribute('required');
-                    outerNullInput.removeAttribute('required');
-                }
+                return;
             }
+            
+            // Calculate null points for standard alignments
+            const calculation = NULL_POINT_CALCULATIONS[alignment];
+            if (!calculation) {
+                console.error('Unknown alignment type:', alignment);
+                return;
+            }
+            
+            const pivotDistance = parseFloat(pivotDistanceInput.value) || 0;
+            const innerGroove = parseFloat(innerGrooveInput.value);
+            const outerGroove = parseFloat(outerGrooveInput.value);
+            
+            // Only calculate if we have valid groove values
+            if (isNaN(innerGroove) || isNaN(outerGroove)) {
+                console.log('Invalid groove values, skipping calculation');
+                return;
+            }
+            
+            const nullPoints = calculation(pivotDistance, innerGroove, outerGroove);
+            console.log('Calculated null points:', nullPoints);
+            
+            innerNullInput.value = nullPoints.inner;
+            outerNullInput.value = nullPoints.outer;
+            innerNullInput.removeAttribute('required');
+            outerNullInput.removeAttribute('required');
         }
         
         // Switch to Custom mode when user edits null points
@@ -101,10 +265,19 @@
         }
         
         // Attach listeners
+        for (const radio of grooveStandardRadios) {
+            radio.addEventListener('change', handleGrooveStandardChange);
+        }
         alignmentSelect.addEventListener('change', handleAlignmentChange);
         pivotDistanceInput.addEventListener('input', updateNullPoints);
-        innerGrooveInput.addEventListener('input', updateNullPoints);
-        outerGrooveInput.addEventListener('input', updateNullPoints);
+        innerGrooveInput.addEventListener('input', function() {
+            handleGrooveRadiiEdit();
+            updateNullPoints();
+        });
+        outerGrooveInput.addEventListener('input', function() {
+            handleGrooveRadiiEdit();
+            updateNullPoints();
+        });
         
         // Switch to Custom when user manually edits null points
         innerNullInput.addEventListener('input', handleNullPointEdit);

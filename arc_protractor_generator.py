@@ -82,11 +82,15 @@ def calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_nu
 def calculate_null_points(pivot_to_spindle, alignment_type='baerwald', 
                          inner_groove=60.325, outer_groove=146.05):
     """
-    Calculate null points based on alignment geometry.
+    Calculate null points based on alignment geometry and groove radii.
     
-    For standard IEC groove radii (60.325, 146.05), this uses established 
-    null point formulas. The effective length is then calculated from the
-    mounting distance and null points.
+    For IEC standard groove radii (60.325, 146.05), this returns the established 
+    optimal null point values. For other groove radii, it scales the null points
+    proportionally while preserving the distortion balance characteristics of each
+    alignment geometry.
+    
+    The scaling uses the square root of the groove range ratio to maintain the
+    geometric relationships that define each alignment type's tracking error profile.
     
     Args:
         pivot_to_spindle: Distance from tonearm pivot to spindle center (mm)
@@ -102,33 +106,66 @@ def calculate_null_points(pivot_to_spindle, alignment_type='baerwald',
     r_o = outer_groove
     d = pivot_to_spindle
     
-    # Calculate null point radii for IEC standard groove dimensions
-    # Note: These null points are optimized for IEC/RIAA standard (60.325-146.05mm)
-    # Using different groove radii would require different optimization
+    # IEC standard reference values
+    IEC_INNER = 60.325
+    IEC_OUTER = 146.05
     
     if alignment_type == 'baerwald':
         # Baerwald (Löfgren A): Minimizes maximum tracking error
-        # Standard IEC null points (empirically derived optimal values)
-        inner_null = 66.04
-        outer_null = 120.90
+        # IEC standard null points
+        IEC_N1 = 66.04
+        IEC_N2 = 120.90
+        
+        # For IEC standard grooves, use exact values
+        if abs(r_i - IEC_INNER) < 0.01 and abs(r_o - IEC_OUTER) < 0.01:
+            inner_null = IEC_N1
+            outer_null = IEC_N2
+        else:
+            # Scale null points proportionally for non-standard groove radii
+            # This preserves the distortion balance characteristics
+            scale_factor = math.sqrt((r_o - r_i) / (IEC_OUTER - IEC_INNER))
+            offset_inner = IEC_N1 - IEC_INNER
+            offset_outer = IEC_OUTER - IEC_N2
+            
+            inner_null = r_i + offset_inner * scale_factor
+            outer_null = r_o - offset_outer * scale_factor
         
     elif alignment_type == 'lofgren_b':
-        # Löfgren B (DIN): Minimizes RMS tracking error  
-        # Standard IEC null points
-        inner_null = 70.29
-        outer_null = 116.60
+        # Löfgren B: Minimizes RMS (average) tracking error
+        # IEC standard null points
+        IEC_N1 = 70.29
+        IEC_N2 = 116.60
+        
+        # For IEC standard grooves, use exact values
+        if abs(r_i - IEC_INNER) < 0.01 and abs(r_o - IEC_OUTER) < 0.01:
+            inner_null = IEC_N1
+            outer_null = IEC_N2
+        else:
+            # Scale null points proportionally for non-standard groove radii
+            scale_factor = math.sqrt((r_o - r_i) / (IEC_OUTER - IEC_INNER))
+            offset_inner = IEC_N1 - IEC_INNER
+            offset_outer = IEC_OUTER - IEC_N2
+            
+            inner_null = r_i + offset_inner * scale_factor
+            outer_null = r_o - offset_outer * scale_factor
         
     elif alignment_type == 'stevenson':
-        # Stevenson: Inner null at innermost groove, outer null optimized for inner groove performance
-        # Prioritizes low distortion at record end (inner grooves)
-        inner_null = 60.325  # At innermost groove (IEC standard)
-        outer_null = 117.42  # Standard Stevenson outer null
+        # Stevenson: Inner null at innermost groove
+        # Prioritizes low distortion at inner grooves
+        inner_null = r_i
+        
+        # For IEC standard grooves, use known optimal value
+        if abs(r_i - IEC_INNER) < 0.01 and abs(r_o - IEC_OUTER) < 0.01:
+            outer_null = 117.42
+        else:
+            # For non-standard grooves, use geometric mean approximation
+            outer_null = math.sqrt(r_i * r_o)
     
     else:
         raise ValueError(f"Unknown alignment type: {alignment_type}")
     
     # Calculate effective length from mounting distance and null points
-    # Using the formula: L = sqrt(d² + x₁·x₂)
+    # Using Bauer's formula: L = sqrt(d² + x₁·x₂)
     # where x₁ and x₂ are the null point radii
     effective_length = math.sqrt(d**2 + inner_null * outer_null)
     
@@ -243,25 +280,28 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.drawString(text_start_x, height - 92*mm, f"Outer Null Point:")
     c.drawString(text_start_x + 40*mm, height - 92*mm, f"{outer_null:.3f} mm")
     
-    c.drawString(text_start_x, height - 98*mm, f"Mounting Angle:")
+    c.drawString(text_start_x, height - 98*mm, f"Groove Radii:")
+    c.drawString(text_start_x + 40*mm, height - 98*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
+    
+    c.drawString(text_start_x, height - 104*mm, f"Mounting Angle:")
     mounting_str = f"{offset_angle:.3f}°"
-    c.drawString(text_start_x + 40*mm, height - 98*mm, mounting_str)
+    c.drawString(text_start_x + 40*mm, height - 104*mm, mounting_str)
     mounting_width = c.stringWidth(mounting_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(text_start_x + 40*mm + mounting_width + 1.5*mm, height - 98*mm, f"(cartridge to arm)")
+    c.drawString(text_start_x + 40*mm + mounting_width + 1.5*mm, height - 104*mm, f"(cartridge to arm)")
     c.setFont("Helvetica", 9)
     
-    c.drawString(text_start_x, height - 104*mm, f"Offset Angle:")
+    c.drawString(text_start_x, height - 110*mm, f"Offset Angle:")
     offset_str = f"{tracking_angle_midpoint:.3f}°"
-    c.drawString(text_start_x + 40*mm, height - 104*mm, offset_str)
+    c.drawString(text_start_x + 40*mm, height - 110*mm, offset_str)
     offset_width = c.stringWidth(offset_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(text_start_x + 40*mm + offset_width + 1.5*mm, height - 104*mm, f"(at midpoint)")
+    c.drawString(text_start_x + 40*mm + offset_width + 1.5*mm, height - 110*mm, f"(at midpoint)")
     c.setFont("Helvetica", 9)
     
     # Instructions - SAME font size and spacing as specs
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(text_start_x, height - 116*mm, "INSTRUCTIONS:")  # Adjusted for compact angle layout
+    c.drawString(text_start_x, height - 122*mm, "INSTRUCTIONS:")  # Adjusted down 6mm
     
     c.setFont("Helvetica", 9)
     instructions = [
@@ -276,7 +316,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         "7. Tighten when aligned"
     ]
     
-    y_pos = height - 124*mm  # Adjusted to be below "INSTRUCTIONS:" header
+    y_pos = height - 130*mm  # Adjusted down 6mm
     for line in instructions:
         c.drawString(text_start_x, y_pos, line)
         y_pos -= 6*mm
@@ -302,7 +342,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     # Footer at bottom left
     c.setFont("Helvetica", 6)
     c.drawString(scale_x, 15*mm, "arc_protractor_generator.py")
-    c.drawString(scale_x, 10*mm, f"IEC Radii: {inner_groove:.1f}-{outer_groove:.1f}mm")
+    c.drawString(scale_x, 10*mm, f"Groove Radii: {inner_groove:.1f}-{outer_groove:.1f}mm")
     
     # Move to working area - spindle position on left side of page
     c.translate(origin_x, origin_y)

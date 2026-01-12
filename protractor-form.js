@@ -153,18 +153,31 @@
         };
 
         // Handle groove standard radio button changes
-        function handleGrooveStandardChange() {
-            const selectedStandard = document.querySelector('input[name="groove_standard"]:checked').value;
+        function handleGrooveStandardChange(event) {
+            console.log('Groove standard change triggered, event type:', event ? event.type : 'unknown');
+            
+            const selectedRadio = document.querySelector('input[name="groove_standard"]:checked');
+            if (!selectedRadio) {
+                console.error('No groove standard radio button is checked');
+                return;
+            }
+            
+            const selectedStandard = selectedRadio.value;
+            console.log('Selected groove standard:', selectedStandard);
             
             if (selectedStandard === 'custom') {
                 // Custom - don't change current values
+                console.log('Custom selected, keeping current groove values');
                 return;
             }
             
             if (GROOVE_STANDARDS[selectedStandard]) {
+                console.log('Applying standard values:', GROOVE_STANDARDS[selectedStandard]);
                 innerGrooveInput.value = GROOVE_STANDARDS[selectedStandard].inner;
                 outerGrooveInput.value = GROOVE_STANDARDS[selectedStandard].outer;
                 updateNullPoints();
+            } else {
+                console.error('Unknown groove standard:', selectedStandard);
             }
         }
         
@@ -265,8 +278,17 @@
         }
         
         // Attach listeners
+        // Use multiple event types for better mobile support
         for (const radio of grooveStandardRadios) {
             radio.addEventListener('change', handleGrooveStandardChange);
+            radio.addEventListener('click', handleGrooveStandardChange);
+            // Also listen on the parent label for mobile touch events
+            if (radio.parentElement && radio.parentElement.tagName === 'LABEL') {
+                radio.parentElement.addEventListener('click', function() {
+                    // Small delay to ensure radio is checked
+                    setTimeout(handleGrooveStandardChange, 50);
+                });
+            }
         }
         alignmentSelect.addEventListener('change', handleAlignmentChange);
         pivotDistanceInput.addEventListener('input', updateNullPoints);

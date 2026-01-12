@@ -1,16 +1,19 @@
 <p>Este formulário gera gabaritos de alinhamento de arco de precisão para o alinhamento de cápsulas fonográficas em toca-discos com braços pivotantes. Basta medir a distância pivot-spindle do seu toca-discos, inserir o valor e quaisquer outras configurações desejadas no formulário, clicar em "Gerar Gabarito" e imprimir seu PDF personalizado em escala de 100%.</p>
 <div class="protractor-form"><form id="protractorForm">
-<div class="form-group"><label for="pivot_distance">Distância Pivot-Spindle (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.01" type="number" placeholder="ex: 215.5"> <small>Meça do pivot do braço até o centro do spindle</small></div>
+<div class="form-group"><label for="pivot_distance">Distância Pivot-Spindle (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.001" type="number" placeholder="ex: 215.5"> <small>Meça do pivot do braço até o centro do spindle</small></div>
 <div class="form-group"><label for="alignment">Geometria de Alinhamento</label><select id="alignment" name="alignment">
 <option value="baerwald">Baerwald (Löfgren A)</option>
 <option value="lofgren_b">Löfgren B</option>
 <option value="stevenson">Stevenson</option>
 <option value="custom">Personalizado</option>
 </select><small>Baerwald: melhor uso geral | Löfgren B: audição de lado completo | Stevenson: foco em sulcos internos</small></div>
-<div class="form-group"><label for="inner_null">Ponto Nulo Interno (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.01" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
-<div class="form-group"><label for="outer_null">Ponto Nulo Externo (mm)</label> <input id="outer_null" max="160" min="80" name="outer_null" step="0.01" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
-<div class="form-group"><label for="inner_groove">Raio de Sulco Interno (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.01" type="number" value="60.33"> <small>IEC padrão: 60.325mm | Compactos 7": ~57mm | 10" 78s: ~60mm</small></div>
-<div class="form-group"><label for="outer_groove">Raio de Sulco Externo (mm)</label> <input id="outer_groove" max="160" min="80" name="outer_groove" required="" step="0.01" type="number" value="146.05"> <small>IEC padrão: 146.05mm | Compactos 7": ~88mm | 10" 78s: ~118mm | 12" 78s: ~140mm</small></div>
+<div class="form-group"><label for="inner_null">Ponto Nulo Interno (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.001" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
+<div class="form-group"><label for="outer_null">Ponto Nulo Externo (mm)</label> <input id="outer_null" max="160" min="40" name="outer_null" step="0.001" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
+<div class="form-group"><label>Padrão de Sulcos</label> <small>Selecione o padrão ou escolha Personalizado para inserir seus próprios valores</small>
+<div class="radio-group"><label><input checked="checked" name="groove_standard" type="radio" value="iec"> IEC/RIAA (60.325-146.05mm)</label> <label><input name="groove_standard" type="radio" value="din"> DIN (57.5-146.05mm)</label> <label><input name="groove_standard" type="radio" value="custom"> Personalizado</label></div>
+</div>
+<div class="form-group"><label for="inner_groove">Raio de Sulco Interno (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.001" type="number" value="60.325"> <small>Preenchido automaticamente pela seleção de padrão (editável)</small></div>
+<div class="form-group"><label for="outer_groove">Raio de Sulco Externo (mm)</label> <input id="outer_groove" max="160" min="70" name="outer_groove" required="" step="0.001" type="number" value="146.05"> <small>Preenchido automaticamente pela seleção de padrão (editável)</small></div>
 <div class="form-group"><label for="turntable_name">Nome do Toca-Discos (opcional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="ex: SME 3009 S2 Improved"> <small>Aparecerá no gabarito</small></div>
 <div class="form-group"><label for="paper_size">Tamanho do Papel</label><select id="paper_size" name="paper_size">
 <option value="A4">A4 (210 × 297 mm)</option>
@@ -70,28 +73,36 @@
 <li>Pontos nulos: 60.33mm, 117.42mm (para sulcos padrão IEC)</li>
 </ul>
 <h3>Alinhamento para Outros Formatos de Disco</h3>
-<p>Embora o formulário use por padrão os raios de sulco de LP de 12" padrão (IEC 60.325-146.05mm), ele pode gerar gabaritos para outros formatos usando parâmetros de sulco personalizados.</p>
-<h4>Compactos Simples de 7" 45 RPM</h4>
-<p>Compactos simples de 7" usam as mesmas especificações de sulco que LPs, mas com dimensões menores. Os raios de sulco típicos são 57-58mm (interno) a 88-90mm (externo). Use a mesma geometria de alinhamento dos LPs.</p>
-<h4>Discos de 10" 78 RPM</h4>
-<p>Os raios de sulco típicos são aproximadamente 60-62mm (interno) a 117-120mm (externo). Para gravações de faixa única (uma música por lado), o alinhamento Löfgren B é recomendado, pois minimiza o erro médio de rastreamento em todo o lado.</p>
-<h4>Discos de 12" 78 RPM</h4>
-<p>Os raios de sulco típicos são aproximadamente 60-65mm (interno) a 135-145mm (externo). Estes eram normalmente usados para música clássica e gravações orquestrais que exigiam maior tempo de reprodução.</p>
-<p><em>Nota: Os discos de 78 RPM são anteriores à padronização IEC e os raios de sulco variavam de acordo com o fabricante e a época. Os valores acima são aproximações típicas.</em></p>
+<p>O formulário fornece padrões de sulcos predefinidos e permite valores personalizados para formatos especializados.</p>
+<h4>Especificações de Sulcos Padrão</h4>
+<p><strong>IEC/RIAA (60.325-146.05mm)</strong> - Padrão internacional usado para a maioria dos LPs modernos de 12" fabricados em todo o mundo.</p>
+<p><strong>DIN (57.5-146.05mm)</strong> - Padrão alemão com raio de sulco interno menor, historicamente usado por alguns fabricantes europeus.</p>
+<h4>Sobre Raios de Sulcos Personalizados</h4>
+<p>O formulário fornece padrões de sulcos predefinidos para conveniência. Para esses valores padrão, o gabarito usa pontos nulos precisamente otimizados derivados de padrões de alinhamento publicados.</p>
+<p><strong>Quando você insere dimensões de sulcos personalizadas</strong> (diferentes de qualquer predefinição), o gerador aproxima os pontos nulos ideais escalando a partir do padrão mais próximo. Esse escalonamento preserva as características de equilíbrio de distorção de cada geometria de alinhamento—a relação matemática entre o posicionamento do ponto nulo e a distribuição do erro de rastreamento.</p>
+<h4>Exemplos Comuns de Formatos Personalizados</h4>
+<p>Selecione o padrão de sulcos "Personalizado" para inserir estes valores:</p>
+<h5>Compactos Simples de 7" 45 RPM</h5>
+<p>Raios de sulco típicos: 57-58mm (interno) a 88-90mm (externo). Estes usam as mesmas especificações de sulco que os LPs, mas com dimensões menores devido ao tamanho do disco.</p>
+<h5>Discos de 10" 78 RPM</h5>
+<p>Raios de sulco típicos: 60-62mm (interno) a 117-120mm (externo). Para gravações de faixa única (uma música por lado), o alinhamento Löfgren B é recomendado, pois minimiza o erro médio de rastreamento em todo o lado.</p>
+<h5>Discos de 12" 78 RPM</h5>
+<p>Raios de sulco típicos: 60-65mm (interno) a 135-145mm (externo). Estes eram normalmente usados para música clássica e gravações orquestrais que exigiam maior tempo de reprodução.</p>
+<p><em>Nota: Os discos de 78 RPM são anteriores à padronização e os raios de sulcos variavam de acordo com o fabricante e a época. Os valores acima são aproximações típicas.</em></p>
 <h3>Exemplos de Distâncias de Montagem de Braços</h3>
-<p><strong>Braços 9":</strong></p>
+<p><strong>Braços de 9":</strong></p>
 <ul>
-<li>SME 3009 S2 Improved (antigo): 215.7 mm</li>
-<li>SME 3009 S2 Improved (recente): 213.25 mm</li>
+<li>SME 3009 S2 Improved (inicial): 215.7 mm</li>
+<li>SME 3009 S2 Improved (tardio): 213.25 mm</li>
 <li>Technics SL-1200: 215.0 mm</li>
 <li>Rega RB300: 222.0 mm</li>
 <li>Audio-Technica AT-LP120: 215.0 mm</li>
-<li>Braços Pro-Ject 8.6": 200.0 mm</li>
+<li>Pro-Ject braços de 8.6": 200.0 mm</li>
 </ul>
-<p><strong>Braços 12":</strong></p>
+<p><strong>Braços de 12":</strong></p>
 <ul>
 <li>SME M2-12R: 295.6 mm</li>
 </ul>
 <h3>Script Python</h3>
-<p>Este formulário web utiliza o script Python de código aberto gerador de gabarito de arco. O script está disponível para download se você preferir executá-lo localmente a partir da linha de comando:</p>
+<p>Este formulário web usa o script Python gerador de gabarito de arco de código aberto. O script está disponível para download se você preferir executá-lo localmente a partir da linha de comando:</p>
 <p><a href="https://github.com/escuta/arc-protractor-generator/releases/latest/download/arc_protractor_generator.py">Baixar Script Python</a> | <a href="https://github.com/escuta/arc-protractor-generator">Ver no GitHub</a></p>

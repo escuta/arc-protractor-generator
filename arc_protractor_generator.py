@@ -203,6 +203,17 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     if custom_nulls:
         inner_null, outer_null = custom_nulls
+        
+        # Validate null points are within valid ranges
+        if inner_null <= inner_groove:
+            raise ValueError(f"Inner null point ({inner_null:.2f}mm) must be greater than inner groove radius ({inner_groove:.2f}mm)")
+        
+        if outer_null >= outer_groove:
+            raise ValueError(f"Outer null point ({outer_null:.2f}mm) must be less than outer groove radius ({outer_groove:.2f}mm)")
+        
+        if inner_null >= outer_null:
+            raise ValueError(f"Inner null point ({inner_null:.2f}mm) must be less than outer null point ({outer_null:.2f}mm)")
+        
         # Use proper geometric solver
         effective_length, overhang, offset_angle, tracking_angle_midpoint = \
             calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_null)
@@ -211,6 +222,20 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         inner_null, outer_null, effective_length, overhang, offset_angle, tracking_angle_midpoint = \
             calculate_null_points(pivot_to_spindle, alignment, inner_groove, outer_groove)
         alignment_name = ALIGNMENTS[alignment]['name']
+        
+        # Validate that calculated null points are within valid ranges
+        # This can happen with very small records or unusual geometries
+        if inner_null <= inner_groove:
+            raise ValueError(f"Calculated inner null point ({inner_null:.2f}mm) is not greater than inner groove radius ({inner_groove:.2f}mm). "
+                           f"This geometry may not be suitable for {alignment_name} alignment with these groove dimensions.")
+        
+        if outer_null >= outer_groove:
+            raise ValueError(f"Calculated outer null point ({outer_null:.2f}mm) is not less than outer groove radius ({outer_groove:.2f}mm). "
+                           f"This geometry may not be suitable for {alignment_name} alignment with these groove dimensions.")
+        
+        if inner_null >= outer_null:
+            raise ValueError(f"Calculated inner null point ({inner_null:.2f}mm) is not less than outer null point ({outer_null:.2f}mm). "
+                           f"This is an invalid geometry - please check your pivot-to-spindle distance and groove dimensions.")
     
     # Set output filename
     if output_file is None:

@@ -313,13 +313,37 @@
             e.preventDefault();
 
             // Validate required fields
-            const pivotDistance = pivotDistanceInput.value;
-            const innerGroove = innerGrooveInput.value;
-            const outerGroove = outerGrooveInput.value;
+            const pivotDistance = parseFloat(pivotDistanceInput.value);
+            const innerGroove = parseFloat(innerGrooveInput.value);
+            const outerGroove = parseFloat(outerGrooveInput.value);
+            const innerNull = parseFloat(innerNullInput.value);
+            const outerNull = parseFloat(outerNullInput.value);
             
             if (!pivotDistance || !innerGroove || !outerGroove) {
                 messageDiv.className = 'alert alert-error';
                 messageDiv.innerHTML = '✗ Please fill in all required fields';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            // Validate null points are within valid ranges
+            if (innerNull <= innerGroove) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = '✗ Inner null point (' + innerNull + 'mm) must be greater than inner groove radius (' + innerGroove + 'mm)';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            if (outerNull >= outerGroove) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = '✗ Outer null point (' + outerNull + 'mm) must be less than outer groove radius (' + outerGroove + 'mm)';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            if (innerNull >= outerNull) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = '✗ Inner null point (' + innerNull + 'mm) must be less than outer null point (' + outerNull + 'mm)';
                 messageDiv.style.display = 'block';
                 return;
             }

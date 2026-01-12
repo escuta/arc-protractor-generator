@@ -8,18 +8,12 @@
 <option value="custom">Custom</option>
 </select><small>Baerwald: best all-round | Löfgren B: full-side listening | Stevenson: inner groove focus</small></div>
 <div class="form-group"><label for="inner_null">Inner Null Point (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.001" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
-<div class="form-group"><label for="outer_null">Outer Null Point (mm)</label> <input id="outer_null" max="160" min="80" name="outer_null" step="0.001" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
-<div class="form-group">
-<label>Groove Standard</label>
-<div class="radio-group">
-<label><input type="radio" name="groove_standard" value="iec" checked> IEC/RIAA (60.325-146.05mm) - Modern 12" LPs</label>
-<label><input type="radio" name="groove_standard" value="din"> DIN (57.5-146.05mm) - German standard</label>
-<label><input type="radio" name="groove_standard" value="custom"> Custom</label>
-</div>
-<small>Select standard or choose Custom to enter your own values</small>
+<div class="form-group"><label for="outer_null">Outer Null Point (mm)</label> <input id="outer_null" max="160" min="40" name="outer_null" step="0.001" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
+<div class="form-group"><label>Groove Standard</label> <small>Select standard or choose Custom to enter your own values</small>
+<div class="radio-group"><label><input checked="checked" name="groove_standard" type="radio" value="iec"> IEC/RIAA (60.325-146.05mm)</label> <label><input name="groove_standard" type="radio" value="din"> DIN (57.5-146.05mm)</label> <label><input name="groove_standard" type="radio" value="custom"> Custom</label></div>
 </div>
 <div class="form-group"><label for="inner_groove">Inner Groove Radius (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.001" type="number" value="60.325"> <small>Auto-filled by standard selection (editable)</small></div>
-<div class="form-group"><label for="outer_groove">Outer Groove Radius (mm)</label> <input id="outer_groove" max="160" min="80" name="outer_groove" required="" step="0.001" type="number" value="146.05"> <small>Auto-filled by standard selection (editable)</small></div>
+<div class="form-group"><label for="outer_groove">Outer Groove Radius (mm)</label> <input id="outer_groove" max="160" min="70" name="outer_groove" required="" step="0.001" type="number" value="146.05"> <small>Auto-filled by standard selection (editable)</small></div>
 <div class="form-group"><label for="turntable_name">Turntable Name (optional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="e.g., SME 3009 S2 Improved"> <small>Will appear on the alignment protractor</small></div>
 <div class="form-group"><label for="paper_size">Paper Size</label><select id="paper_size" name="paper_size">
 <option value="A4">A4 (210 × 297 mm)</option>
@@ -80,24 +74,18 @@
 </ul>
 <h3>Alignment for Other Record Formats</h3>
 <p>The form provides preset groove standards and allows custom values for specialized formats.</p>
-
 <h4>Standard Groove Specifications</h4>
 <p><strong>IEC/RIAA (60.325-146.05mm)</strong> - International standard used for most modern 12" LPs manufactured worldwide.</p>
 <p><strong>DIN (57.5-146.05mm)</strong> - German standard with smaller inner groove radius, historically used by some European manufacturers.</p>
-
 <h4>About Custom Groove Radii</h4>
 <p>The form provides preset groove standards for convenience. For these standard values, the protractor uses precisely optimized null points derived from published alignment standards.</p>
 <p><strong>When you enter custom groove dimensions</strong> (different from any preset), the generator approximates optimal null points by scaling from the nearest standard. This scaling preserves the distortion balance characteristics of each alignment geometry—the mathematical relationship between null point placement and tracking error distribution.</p>
-
 <h4>Common Custom Format Examples</h4>
 <p>Select "Custom" groove standard to enter these values:</p>
-
 <h5>7" 45 RPM Singles</h5>
 <p>Typical groove radii: 57-58mm (inner) to 88-90mm (outer). These use the same groove specifications as LPs but with smaller dimensions due to the record size.</p>
-
 <h5>10" 78 RPM Records</h5>
 <p>Typical groove radii: 60-62mm (inner) to 117-120mm (outer). For single-track recordings (one song per side), Löfgren B alignment is recommended as it minimizes average tracking error across the entire side.</p>
-
 <h5>12" 78 RPM Records</h5>
 <p>Typical groove radii: 60-65mm (inner) to 135-145mm (outer). These were typically used for classical music and orchestral recordings requiring longer playing time.</p>
 <p><em>Note: 78 RPM records pre-date standardization and groove radii varied by manufacturer and era. The values above are typical approximations.</em></p>

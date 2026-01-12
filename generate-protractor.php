@@ -78,17 +78,46 @@ if ($alignment === 'custom') {
         echo json_encode(['error' => 'Custom alignment requires both inner and outer null points']);
         exit;
     }
-    if ($inner_null < 40 || $inner_null > 100) {
+    
+    // Validate null points are within reasonable absolute ranges
+    if ($inner_null < 40 || $inner_null > 160) {
         http_response_code(400);
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Inner null point must be between 40-100mm']);
+        echo json_encode(['error' => 'Inner null point must be between 40-160mm']);
         exit;
     }
-    if ($outer_null < 80 || $outer_null > 160) {
+    if ($outer_null < 40 || $outer_null > 160) {
         http_response_code(400);
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Outer null point must be between 80-160mm']);
+        echo json_encode(['error' => 'Outer null point must be between 40-160mm']);
         exit;
+    }
+    
+    // Validate null points relative to each other
+    if ($inner_null >= $outer_null) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Inner null point (' . $inner_null . 'mm) must be less than outer null point (' . $outer_null . 'mm)']);
+        exit;
+    }
+    
+    // Validate null points relative to groove boundaries if provided
+    if ($inner_groove !== null && $inner_groove !== false) {
+        if ($inner_null <= $inner_groove) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Inner null point (' . $inner_null . 'mm) must be greater than inner groove radius (' . $inner_groove . 'mm)']);
+            exit;
+        }
+    }
+    
+    if ($outer_groove !== null && $outer_groove !== false) {
+        if ($outer_null >= $outer_groove) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Outer null point (' . $outer_null . 'mm) must be less than outer groove radius (' . $outer_groove . 'mm)']);
+            exit;
+        }
     }
 }
 
@@ -103,10 +132,21 @@ if ($inner_groove !== null && $inner_groove !== false) {
 }
 
 if ($outer_groove !== null && $outer_groove !== false) {
-    if ($outer_groove < 80 || $outer_groove > 160) {
+    if ($outer_groove < 70 || $outer_groove > 160) {
         http_response_code(400);
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Outer groove radius must be between 80-160mm']);
+        echo json_encode(['error' => 'Outer groove radius must be between 70-160mm']);
+        exit;
+    }
+}
+
+// Validate that inner groove is less than outer groove
+if ($inner_groove !== null && $inner_groove !== false && 
+    $outer_groove !== null && $outer_groove !== false) {
+    if ($inner_groove >= $outer_groove) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Inner groove radius (' . $inner_groove . 'mm) must be less than outer groove radius (' . $outer_groove . 'mm)']);
         exit;
     }
 }

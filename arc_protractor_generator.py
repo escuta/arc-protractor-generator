@@ -224,9 +224,12 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         alignment_name = ALIGNMENTS[alignment]['name']
         
         # Validate that calculated null points are within valid ranges
-        # This can happen with very small records or unusual geometries
-        if inner_null <= inner_groove:
-            raise ValueError(f"Calculated inner null point ({inner_null:.2f}mm) is not greater than inner groove radius ({inner_groove:.2f}mm). "
+        # Note: Stevenson alignment allows inner_null == inner_groove by design
+        # Use small tolerance for floating point comparison
+        tolerance = 0.001  # 1 micron tolerance
+        
+        if inner_null < (inner_groove - tolerance):
+            raise ValueError(f"Calculated inner null point ({inner_null:.2f}mm) is less than inner groove radius ({inner_groove:.2f}mm). "
                            f"This geometry may not be suitable for {alignment_name} alignment with these groove dimensions.")
         
         if outer_null >= outer_groove:

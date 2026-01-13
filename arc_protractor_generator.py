@@ -348,40 +348,40 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.setFont("Helvetica-Bold", 9)
     c.drawString(data_x, data_start_y, "Data")
     
-    # Specs with 4mm spacing between lines (reduced from 6mm)
+    # Specs with 5mm spacing between lines (was 6mm, reduced to 4mm, now 5mm)
     c.setFont("Helvetica", 9)
-    c.drawString(data_x, data_start_y - 6*mm, f"Pivot to Spindle:")
-    c.drawString(data_x + 40*mm, data_start_y - 6*mm, f"{pivot_to_spindle:.2f} mm")
+    c.drawString(data_x, data_start_y - 7*mm, f"Pivot to Spindle:")
+    c.drawString(data_x + 40*mm, data_start_y - 7*mm, f"{pivot_to_spindle:.2f} mm")
     
-    c.drawString(data_x, data_start_y - 10*mm, f"Effective Length:")
-    c.drawString(data_x + 40*mm, data_start_y - 10*mm, f"{effective_length:.3f} mm")
+    c.drawString(data_x, data_start_y - 12*mm, f"Effective Length:")
+    c.drawString(data_x + 40*mm, data_start_y - 12*mm, f"{effective_length:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 14*mm, f"Overhang:")
-    c.drawString(data_x + 40*mm, data_start_y - 14*mm, f"{overhang:.3f} mm")
+    c.drawString(data_x, data_start_y - 17*mm, f"Overhang:")
+    c.drawString(data_x + 40*mm, data_start_y - 17*mm, f"{overhang:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 18*mm, f"Inner Null Point:")
-    c.drawString(data_x + 40*mm, data_start_y - 18*mm, f"{inner_null:.3f} mm")
+    c.drawString(data_x, data_start_y - 22*mm, f"Inner Null Point:")
+    c.drawString(data_x + 40*mm, data_start_y - 22*mm, f"{inner_null:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 22*mm, f"Outer Null Point:")
-    c.drawString(data_x + 40*mm, data_start_y - 22*mm, f"{outer_null:.3f} mm")
+    c.drawString(data_x, data_start_y - 27*mm, f"Outer Null Point:")
+    c.drawString(data_x + 40*mm, data_start_y - 27*mm, f"{outer_null:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 26*mm, f"Groove Radii:")
-    c.drawString(data_x + 40*mm, data_start_y - 26*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
+    c.drawString(data_x, data_start_y - 32*mm, f"Groove Radii:")
+    c.drawString(data_x + 40*mm, data_start_y - 32*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
     
-    c.drawString(data_x, data_start_y - 30*mm, f"Mounting Angle:")
+    c.drawString(data_x, data_start_y - 37*mm, f"Mounting Angle:")
     mounting_str = f"{offset_angle:.3f}°"
-    c.drawString(data_x + 40*mm, data_start_y - 30*mm, mounting_str)
+    c.drawString(data_x + 40*mm, data_start_y - 37*mm, mounting_str)
     mounting_width = c.stringWidth(mounting_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(data_x + 40*mm + mounting_width + 1.5*mm, data_start_y - 30*mm, f"(cartridge to arm)")
+    c.drawString(data_x + 40*mm + mounting_width + 1.5*mm, data_start_y - 37*mm, f"(cartridge to arm)")
     c.setFont("Helvetica", 9)
     
-    c.drawString(data_x, data_start_y - 34*mm, f"Offset Angle:")
+    c.drawString(data_x, data_start_y - 42*mm, f"Offset Angle:")
     offset_str = f"{tracking_angle_midpoint:.3f}°"
-    c.drawString(data_x + 40*mm, data_start_y - 34*mm, offset_str)
+    c.drawString(data_x + 40*mm, data_start_y - 42*mm, offset_str)
     offset_width = c.stringWidth(offset_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(data_x + 40*mm + offset_width + 1.5*mm, data_start_y - 34*mm, f"(at midpoint)")
+    c.drawString(data_x + 40*mm + offset_width + 1.5*mm, data_start_y - 42*mm, f"(at midpoint)")
     c.setFont("Helvetica", 9)
     
     # Scale verification at BOTTOM LEFT (below data section)

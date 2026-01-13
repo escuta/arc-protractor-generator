@@ -269,94 +269,133 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Position origin (spindle) near top of page - MOVED 1cm RIGHT
     origin_x = 65 * mm  # Moved 1cm right (reduced from 2cm)
-    origin_y = height - 60*mm  # 60mm from top
+    origin_y = height - 60*mm + 5*mm  # 55mm from top (raised by 0.5cm)
     
     # Text column on right side (UNCHANGED - text stays in place)
     text_start_x = 125*mm  # Right column for all text
     
-    # Title and specs at top right
+    # Title and specs at top
+    # Align titles with Data text on left side
+    title_left_x = 20*mm  # Aligned with data_x
+    
+    # Align top of "Arc Protractor" with top of scissors (height - 20mm)
+    # Font size 16 has approximately 5.6mm height, so baseline should be ~5.6mm below top
+    title_baseline_y = height - 20*mm - 5.6*mm  # Approximately height - 25.6mm
+    
     if custom_name:
         # Custom name: "Arc Protractor" on first line, name on second line
-        c.setFont("Helvetica-Bold", 16)  # Increased from 14
-        c.drawString(text_start_x, height - 40*mm, "Arc Protractor")
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(title_left_x, title_baseline_y, "Arc Protractor")
+        
+        # Reduced spacing: 8mm between lines (was 12mm)
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(text_start_x, height - 52*mm, custom_name)  # Adjusted position
-        # Show alignment type smaller below
+        c.drawString(title_left_x, title_baseline_y - 8*mm, custom_name)
+        
+        # Show alignment type smaller below with 6mm spacing
         c.setFont("Helvetica", 9)
-        c.drawString(text_start_x, height - 60*mm, alignment_name)  # Adjusted position
+        c.drawString(title_left_x, title_baseline_y - 14*mm, alignment_name)
     else:
-        # Standard title
-        c.setFont("Helvetica-Bold", 16)  # Increased from 14
-        c.drawString(text_start_x, height - 40*mm, f"Arc Protractor")
+        # Standard title - no custom name, so raise geometry name to second line position
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(title_left_x, title_baseline_y, "Arc Protractor")
+        
+        # Geometry name raised to where custom_name would be (8mm below instead of staying at third line)
         c.setFont("Helvetica-Bold", 11)
-        c.drawString(text_start_x, height - 52*mm, f"{alignment_name}")  # Adjusted
+        c.drawString(title_left_x, title_baseline_y - 8*mm, alignment_name)
     
-    # Specs with 6mm spacing between lines
+    # Add vertical scissor icon and dashed cutting line to separate protractor from text
+    # Position between the protractor area and text column
+    # Current position: text_start_x - 2.5mm
+    # Move 2cm right: text_start_x - 2.5mm + 20mm = text_start_x + 17.5mm
+    cut_line_x = text_start_x + 17.5*mm
+    
+    # Draw scissor symbol at top of cutting line
+    c.setFont("Helvetica", 16)
+    # Original: height - 35mm
+    # First adjustment: +20mm up
+    # Second adjustment: -5mm down
+    # Net: height - 35mm + 20mm - 5mm = height - 20mm
+    scissor_y = height - 20*mm
+    c.saveState()
+    c.translate(cut_line_x, scissor_y)
+    c.rotate(90)  # Rotate scissor 90 degrees for vertical cut
+    c.drawString(-3*mm, -2*mm, "✂")
+    c.restoreState()
+    
+    # Draw vertical dashed cutting line (quarter of the original length)
+    # Original length was from height - 45mm to 20mm (total: height - 65mm)
+    # Quarter length: (height - 65mm) / 4
+    line_length = (height - 45*mm - 20*mm) / 4
+    # First adjustment: +20mm up, Second: -5mm down = +15mm net
+    line_start_y = height - 45*mm + 15*mm  # height - 30mm
+    line_end_y = line_start_y - line_length
+    
+    c.setDash(3, 3)  # 3mm dash, 3mm gap
+    c.setLineWidth(0.5)
+    c.setStrokeColorRGB(0.5, 0.5, 0.5)  # Gray color
+    c.line(cut_line_x, line_start_y, cut_line_x, line_end_y)
+    
+    # Reset to solid line for rest of drawing
+    c.setDash()
+    c.setStrokeColorRGB(0, 0, 0)  # Back to black
+    
+    # Data section - moved to left side, beneath protractor
+    # Position it lower to avoid overlap with protractor graphic
+    data_x = 20*mm  # Left side, aligned with scale
+    data_start_y = 90*mm  # Raised by 1cm (from 80mm to 90mm)
+    
+    # "Data" title in bold
+    c.setFont("Helvetica-Bold", 9)
+    c.drawString(data_x, data_start_y, "Data")
+    
+    # Specs with 4mm spacing between lines (reduced from 6mm)
     c.setFont("Helvetica", 9)
-    c.drawString(text_start_x, height - 68*mm, f"Pivot to Spindle:")  # Adjusted from 66mm
-    c.drawString(text_start_x + 40*mm, height - 68*mm, f"{pivot_to_spindle:.2f} mm")
+    c.drawString(data_x, data_start_y - 6*mm, f"Pivot to Spindle:")
+    c.drawString(data_x + 40*mm, data_start_y - 6*mm, f"{pivot_to_spindle:.2f} mm")
     
-    c.drawString(text_start_x, height - 74*mm, f"Effective Length:")
-    c.drawString(text_start_x + 40*mm, height - 74*mm, f"{effective_length:.3f} mm")
+    c.drawString(data_x, data_start_y - 10*mm, f"Effective Length:")
+    c.drawString(data_x + 40*mm, data_start_y - 10*mm, f"{effective_length:.3f} mm")
     
-    c.drawString(text_start_x, height - 80*mm, f"Overhang:")
-    c.drawString(text_start_x + 40*mm, height - 80*mm, f"{overhang:.3f} mm")
+    c.drawString(data_x, data_start_y - 14*mm, f"Overhang:")
+    c.drawString(data_x + 40*mm, data_start_y - 14*mm, f"{overhang:.3f} mm")
     
-    c.drawString(text_start_x, height - 86*mm, f"Inner Null Point:")
-    c.drawString(text_start_x + 40*mm, height - 86*mm, f"{inner_null:.3f} mm")
+    c.drawString(data_x, data_start_y - 18*mm, f"Inner Null Point:")
+    c.drawString(data_x + 40*mm, data_start_y - 18*mm, f"{inner_null:.3f} mm")
     
-    c.drawString(text_start_x, height - 92*mm, f"Outer Null Point:")
-    c.drawString(text_start_x + 40*mm, height - 92*mm, f"{outer_null:.3f} mm")
+    c.drawString(data_x, data_start_y - 22*mm, f"Outer Null Point:")
+    c.drawString(data_x + 40*mm, data_start_y - 22*mm, f"{outer_null:.3f} mm")
     
-    c.drawString(text_start_x, height - 98*mm, f"Groove Radii:")
-    c.drawString(text_start_x + 40*mm, height - 98*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
+    c.drawString(data_x, data_start_y - 26*mm, f"Groove Radii:")
+    c.drawString(data_x + 40*mm, data_start_y - 26*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
     
-    c.drawString(text_start_x, height - 104*mm, f"Mounting Angle:")
+    c.drawString(data_x, data_start_y - 30*mm, f"Mounting Angle:")
     mounting_str = f"{offset_angle:.3f}°"
-    c.drawString(text_start_x + 40*mm, height - 104*mm, mounting_str)
+    c.drawString(data_x + 40*mm, data_start_y - 30*mm, mounting_str)
     mounting_width = c.stringWidth(mounting_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(text_start_x + 40*mm + mounting_width + 1.5*mm, height - 104*mm, f"(cartridge to arm)")
+    c.drawString(data_x + 40*mm + mounting_width + 1.5*mm, data_start_y - 30*mm, f"(cartridge to arm)")
     c.setFont("Helvetica", 9)
     
-    c.drawString(text_start_x, height - 110*mm, f"Offset Angle:")
+    c.drawString(data_x, data_start_y - 34*mm, f"Offset Angle:")
     offset_str = f"{tracking_angle_midpoint:.3f}°"
-    c.drawString(text_start_x + 40*mm, height - 110*mm, offset_str)
+    c.drawString(data_x + 40*mm, data_start_y - 34*mm, offset_str)
     offset_width = c.stringWidth(offset_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(text_start_x + 40*mm + offset_width + 1.5*mm, height - 110*mm, f"(at midpoint)")
+    c.drawString(data_x + 40*mm + offset_width + 1.5*mm, data_start_y - 34*mm, f"(at midpoint)")
     c.setFont("Helvetica", 9)
     
-    # Instructions - SAME font size and spacing as specs
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(text_start_x, height - 122*mm, "INSTRUCTIONS:")  # Adjusted down 6mm
-    
-    c.setFont("Helvetica", 9)
-    instructions = [
-        "1. Print at 100% scale",
-        "2. Verify 100mm bar below",
-        "3. Cut out spindle hole",
-        "4. Place on turntable",
-        "5. Lower stylus onto arc",
-        "6. At each null point:",
-        "   - Stylus tip on black dot",
-        "   - Cartridge parallel to grid lines",
-        "7. Tighten when aligned"
-    ]
-    
-    y_pos = height - 130*mm  # Adjusted down 6mm
-    for line in instructions:
-        c.drawString(text_start_x, y_pos, line)
-        y_pos -= 6*mm
-    
-    # Scale verification at BOTTOM LEFT (below protractor area)
+    # Scale verification at BOTTOM LEFT (below data section)
     scale_x = 20*mm  # Left side
-    scale_y = 30*mm  # Near bottom
     
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(scale_x, scale_y + 20*mm, "SCALE VERIFICATION:")
+    # "100.0 mm" text position - raise by 0.5cm (from 7mm to 12mm)
+    hundred_mm_y = 12*mm
+    
+    # Scale bar should be 10mm above the "100.0 mm" text
+    scale_y = hundred_mm_y + 10*mm  # 22mm from bottom
+    
+    # Verification text - 5mm above scale bar
     c.setFont("Helvetica", 9)
-    c.drawString(scale_x, scale_y + 12*mm, "This bar must measure exactly:")
+    c.drawString(scale_x, scale_y + 5*mm, "Scale verification. This bar must measure exactly:")
     
     # 100mm scale bar
     c.setStrokeColorRGB(0, 0, 0)
@@ -365,12 +404,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.line(scale_x, scale_y - 3*mm, scale_x, scale_y + 3*mm)
     c.line(scale_x + 100*mm, scale_y - 3*mm, scale_x + 100*mm, scale_y + 3*mm)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(scale_x + 37*mm, scale_y - 10*mm, "100.0 mm")
-    
-    # Footer at bottom left
-    c.setFont("Helvetica", 6)
-    c.drawString(scale_x, 15*mm, "arc_protractor_generator.py")
-    c.drawString(scale_x, 10*mm, f"Groove Radii: {inner_groove:.1f}-{outer_groove:.1f}mm")
+    c.drawString(scale_x + 37*mm, hundred_mm_y, "100.0 mm")
     
     # Move to working area - spindle position on left side of page
     c.translate(origin_x, origin_y)
@@ -385,9 +419,10 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.line(-5*mm, 0, 5*mm, 0)
     c.line(0, -5*mm, 0, 5*mm)
     
-    # Spindle label - above spindle since it's now at top
+    # Spindle label - vertically centered on spindle center
     c.setFont("Helvetica-Bold", 9)
-    c.drawString(6*mm, 6*mm, "SPINDLE")
+    # Font size 9 has approximately 3.2mm height, so offset by half to center
+    c.drawString(6*mm, -1.6*mm, "Spindle")
     
     # Calculate pivot point position - RIGHT side for normal turntables
     pivot_x = pivot_to_spindle * mm  # POSITIVE = to the right

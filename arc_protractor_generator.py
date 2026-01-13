@@ -269,7 +269,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Position origin (spindle) near top of page - MOVED 1cm RIGHT
     origin_x = 65 * mm  # Moved 1cm right (reduced from 2cm)
-    origin_y = height - 60*mm + 5*mm  # 55mm from top (raised by 0.5cm)
+    origin_y = height - 60*mm + 5*mm - 7.5*mm  # Moved down by 0.75cm (62.5mm from top)
     
     # Text column on right side (UNCHANGED - text stays in place)
     text_start_x = 125*mm  # Right column for all text
@@ -280,7 +280,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Align top of "Arc Protractor" with top of scissors (height - 20mm)
     # Font size 16 has approximately 5.6mm height, so baseline should be ~5.6mm below top
-    title_baseline_y = height - 20*mm - 5.6*mm  # Approximately height - 25.6mm
+    title_baseline_y = height - 20*mm - 5.6*mm - 7.5*mm  # Moved down by 0.75cm
     
     if custom_name:
         # Custom name: "Arc Protractor" on first line, name on second line
@@ -311,38 +311,39 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Draw scissor symbol at top of cutting line
     c.setFont("Helvetica", 16)
-    # Original: height - 35mm
-    # First adjustment: +20mm up
-    # Second adjustment: -5mm down
-    # Net: height - 35mm + 20mm - 5mm = height - 20mm
-    scissor_y = height - 20*mm
+    scissor_y = height - 20*mm - 7.5*mm  # Moved down by 0.75cm
     c.saveState()
     c.translate(cut_line_x, scissor_y)
     c.rotate(90)  # Rotate scissor 90 degrees for vertical cut
     c.drawString(-3*mm, -2*mm, "✂")
     c.restoreState()
     
-    # Draw vertical dashed cutting line (quarter of the original length)
-    # Original length was from height - 45mm to 20mm (total: height - 65mm)
-    # Quarter length: (height - 65mm) / 4
-    line_length = (height - 45*mm - 20*mm) / 4
-    # First adjustment: +20mm up, Second: -5mm down = +15mm net
-    line_start_y = height - 45*mm + 15*mm  # height - 30mm
-    line_end_y = line_start_y - line_length
+    # Draw vertical dashed cutting line - extend to bottom of "100.0 mm" text
+    # Line starts below scissor and extends down to hundred_mm_y (which is 12mm from bottom)
+    line_start_y = height - 45*mm + 15*mm - 7.5*mm  # Moved down by 0.75cm
+    line_end_y = 12*mm  # Bottom of "100.0 mm" text
     
-    c.setDash(3, 3)  # 3mm dash, 3mm gap
-    c.setLineWidth(0.5)
-    c.setStrokeColorRGB(0.5, 0.5, 0.5)  # Gray color
-    c.line(cut_line_x, line_start_y, cut_line_x, line_end_y)
+    # Draw as individual short line segments instead of using setDash for better printing
+    c.setLineWidth(0.6)  # Same thickness as scale bar
+    c.setStrokeColorRGB(0, 0, 0)  # Use black instead of gray for better printing
     
-    # Reset to solid line for rest of drawing
-    c.setDash()
+    # Draw short line segments (3mm on, 3mm off)
+    current_y = line_start_y
+    dash_length = 3*mm
+    gap_length = 3*mm
+    
+    while current_y > line_end_y:
+        segment_end = max(current_y - dash_length, line_end_y)
+        c.line(cut_line_x, current_y, cut_line_x, segment_end)
+        current_y = segment_end - gap_length
+    
+    # Reset stroke color
     c.setStrokeColorRGB(0, 0, 0)  # Back to black
     
     # Data section - moved to left side, beneath protractor
     # Position it lower to avoid overlap with protractor graphic
     data_x = 20*mm  # Left side, aligned with scale
-    data_start_y = 90*mm  # Raised by 1cm (from 80mm to 90mm)
+    data_start_y = 90*mm - 7.5*mm  # Moved down by 0.75cm (now 82.5mm)
     
     # "Data" title in bold
     c.setFont("Helvetica-Bold", 9)

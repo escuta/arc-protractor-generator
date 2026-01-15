@@ -118,7 +118,7 @@
         const outerNullInput = document.getElementById('outer_null');
         const messageDiv = document.getElementById('message');
         const generateBtn = document.getElementById('generateBtn');
-        const grooveStandardRadios = document.getElementsByName('groove_standard');
+        const grooveStandardSelect = document.getElementById('groove_standard');
 
         // Check if form exists on this page
         if (!form) {
@@ -134,7 +134,7 @@
             'outerGrooveInput': outerGrooveInput,
             'innerNullInput': innerNullInput,
             'outerNullInput': outerNullInput,
-            'grooveStandardRadios': grooveStandardRadios
+            'grooveStandardSelect': grooveStandardSelect
         };
 
         for (const [name, element] of Object.entries(requiredElements)) {
@@ -152,17 +152,11 @@
             din: { inner: 57.5, outer: 146.05 }
         };
 
-        // Handle groove standard radio button changes
+        // Handle groove standard dropdown changes
         function handleGrooveStandardChange(event) {
-            console.log('Groove standard change triggered, event type:', event ? event.type : 'unknown');
+            console.log('Groove standard change triggered');
             
-            const selectedRadio = document.querySelector('input[name="groove_standard"]:checked');
-            if (!selectedRadio) {
-                console.error('No groove standard radio button is checked');
-                return;
-            }
-            
-            const selectedStandard = selectedRadio.value;
+            const selectedStandard = grooveStandardSelect.value;
             console.log('Selected groove standard:', selectedStandard);
             
             if (selectedStandard === 'custom') {
@@ -183,7 +177,7 @@
         
         // Switch to Custom when user manually edits groove radii
         function handleGrooveRadiiEdit() {
-            const selectedStandard = document.querySelector('input[name="groove_standard"]:checked').value;
+            const selectedStandard = grooveStandardSelect.value;
             
             // Check if current values match any standard
             const currentInner = parseFloat(innerGrooveInput.value);
@@ -208,7 +202,7 @@
             // If values don't match any standard, switch to Custom
             if (!matchesStandard && selectedStandard !== 'custom') {
                 console.log('Switching to custom groove standard');
-                document.querySelector('input[name="groove_standard"][value="custom"]').checked = true;
+                grooveStandardSelect.value = 'custom';
             }
         }
 
@@ -278,18 +272,7 @@
         }
         
         // Attach listeners
-        // Use multiple event types for better mobile support
-        for (const radio of grooveStandardRadios) {
-            radio.addEventListener('change', handleGrooveStandardChange);
-            radio.addEventListener('click', handleGrooveStandardChange);
-            // Also listen on the parent label for mobile touch events
-            if (radio.parentElement && radio.parentElement.tagName === 'LABEL') {
-                radio.parentElement.addEventListener('click', function() {
-                    // Small delay to ensure radio is checked
-                    setTimeout(handleGrooveStandardChange, 50);
-                });
-            }
-        }
+        grooveStandardSelect.addEventListener('change', handleGrooveStandardChange);
         alignmentSelect.addEventListener('change', handleAlignmentChange);
         pivotDistanceInput.addEventListener('input', updateNullPoints);
         innerGrooveInput.addEventListener('input', function() {
@@ -327,9 +310,13 @@
             }
 
             // Validate null points are within valid ranges
-            if (innerNull <= innerGroove) {
+            // Note: Stevenson alignment allows inner_null == inner_groove by design
+            // Use small tolerance for floating point comparison
+            const tolerance = 0.001; // 1 micron tolerance
+            
+            if (innerNull < (innerGroove - tolerance)) {
                 messageDiv.className = 'alert alert-error';
-                messageDiv.innerHTML = '✗ Inner null point (' + innerNull + 'mm) must be greater than inner groove radius (' + innerGroove + 'mm)';
+                messageDiv.innerHTML = '✗ Inner null point (' + innerNull + 'mm) must be greater than or equal to inner groove radius (' + innerGroove + 'mm)';
                 messageDiv.style.display = 'block';
                 return;
             }
@@ -361,6 +348,12 @@
             formData.append('alignment', alignmentSelect.value);
             formData.append('turntable_name', document.getElementById('turntable_name').value);
             formData.append('paper_size', document.getElementById('paper_size').value);
+            
+            // Add language parameter from hidden field
+            const languageInput = document.getElementById('language');
+            if (languageInput) {
+                formData.append('language', languageInput.value);
+            }
             
             // Always send groove values
             formData.append('inner_groove', innerGroove);

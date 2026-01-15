@@ -41,6 +41,48 @@ ALIGNMENTS = {
     }
 }
 
+# Translation strings
+TRANSLATIONS = {
+    'en': {
+        'arc_protractor': 'Arc Protractor',
+        'data': 'Data',
+        'pivot_to_spindle': 'Pivot to Spindle:',
+        'effective_length': 'Effective Length:',
+        'overhang': 'Overhang:',
+        'inner_null_point': 'Inner Null Point:',
+        'outer_null_point': 'Outer Null Point:',
+        'groove_radii': 'Groove Radii:',
+        'mounting_angle': 'Mounting Angle:',
+        'mounting_angle_note': '(cartridge to arm)',
+        'offset_angle': 'Offset Angle:',
+        'offset_angle_note': '(at midpoint)',
+        'scale_verification': 'Scale verification. This bar must measure exactly:',
+        'spindle': 'Spindle',
+        'pivot': 'PIVOT',
+        'inner_null_label': 'Inner Null Point',
+        'outer_null_label': 'Outer Null Point'
+    },
+    'pt': {
+        'arc_protractor': 'Gabarito de Alinhamento de Cápsula',
+        'data': 'Dados',
+        'pivot_to_spindle': 'Pivô ao Eixo:',
+        'effective_length': 'Comprimento Efetivo:',
+        'overhang': 'Overhang:',
+        'inner_null_point': 'Ponto Nulo Interno:',
+        'outer_null_point': 'Ponto Nulo Externo:',
+        'groove_radii': 'Raios do Sulco:',
+        'mounting_angle': 'Ângulo de Montagem:',
+        'mounting_angle_note': '(cápsula ao braço)',
+        'offset_angle': 'Ângulo de Offset:',
+        'offset_angle_note': '(no ponto médio)',
+        'scale_verification': 'Verificação de escala. Esta barra deve medir exatamente:',
+        'spindle': 'Eixo',
+        'pivot': 'PIVÔ',
+        'inner_null_label': 'Ponto Nulo Interno',
+        'outer_null_label': 'Ponto Nulo Externo'
+    }
+}
+
 def calculate_effective_length_from_nulls(pivot_to_spindle, inner_null, outer_null):
     """
     Calculate effective length from null points using geometric analysis.
@@ -186,7 +228,7 @@ def calculate_null_points(pivot_to_spindle, alignment_type='baerwald',
 def draw_arc_protractor(pivot_to_spindle, alignment='baerwald', 
                        output_file=None, custom_nulls=None,
                        inner_groove=60.325, outer_groove=146.05, custom_name=None,
-                       papersize='A4'):
+                       papersize='A4', language='en'):
     """
     Generate arc protractor PDF.
     
@@ -199,7 +241,13 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
         outer_groove: Outer groove radius (mm)
         custom_name: Custom name/description for the protractor
         papersize: Paper size ('A4', 'US', or 'letter')
+        language: Language for labels ('en' or 'pt')
     """
+    
+    # Get translations for the selected language
+    if language not in TRANSLATIONS:
+        language = 'en'  # Default to English
+    t = TRANSLATIONS[language]
     
     if custom_nulls:
         inner_null, outer_null = custom_nulls
@@ -285,7 +333,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     if custom_name:
         # Custom name: "Arc Protractor" on first line, name on second line
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(title_left_x, title_baseline_y, "Arc Protractor")
+        c.drawString(title_left_x, title_baseline_y, t['arc_protractor'])
         
         # Reduced spacing: 8mm between lines (was 12mm)
         c.setFont("Helvetica-Bold", 12)
@@ -297,7 +345,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     else:
         # Standard title - no custom name, so raise geometry name to second line position
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(title_left_x, title_baseline_y, "Arc Protractor")
+        c.drawString(title_left_x, title_baseline_y, t['arc_protractor'])
         
         # Geometry name raised to where custom_name would be (8mm below instead of staying at third line)
         c.setFont("Helvetica-Bold", 11)
@@ -347,42 +395,42 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # "Data" title in bold
     c.setFont("Helvetica-Bold", 9)
-    c.drawString(data_x, data_start_y, "Data")
+    c.drawString(data_x, data_start_y, t['data'])
     
     # Specs with 5mm spacing between lines (was 6mm, reduced to 4mm, now 5mm)
     c.setFont("Helvetica", 9)
-    c.drawString(data_x, data_start_y - 7*mm, f"Pivot to Spindle:")
+    c.drawString(data_x, data_start_y - 7*mm, t['pivot_to_spindle'])
     c.drawString(data_x + 40*mm, data_start_y - 7*mm, f"{pivot_to_spindle:.2f} mm")
     
-    c.drawString(data_x, data_start_y - 12*mm, f"Effective Length:")
+    c.drawString(data_x, data_start_y - 12*mm, t['effective_length'])
     c.drawString(data_x + 40*mm, data_start_y - 12*mm, f"{effective_length:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 17*mm, f"Overhang:")
+    c.drawString(data_x, data_start_y - 17*mm, t['overhang'])
     c.drawString(data_x + 40*mm, data_start_y - 17*mm, f"{overhang:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 22*mm, f"Inner Null Point:")
+    c.drawString(data_x, data_start_y - 22*mm, t['inner_null_point'])
     c.drawString(data_x + 40*mm, data_start_y - 22*mm, f"{inner_null:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 27*mm, f"Outer Null Point:")
+    c.drawString(data_x, data_start_y - 27*mm, t['outer_null_point'])
     c.drawString(data_x + 40*mm, data_start_y - 27*mm, f"{outer_null:.3f} mm")
     
-    c.drawString(data_x, data_start_y - 32*mm, f"Groove Radii:")
+    c.drawString(data_x, data_start_y - 32*mm, t['groove_radii'])
     c.drawString(data_x + 40*mm, data_start_y - 32*mm, f"{inner_groove:.2f} - {outer_groove:.2f} mm")
     
-    c.drawString(data_x, data_start_y - 37*mm, f"Mounting Angle:")
+    c.drawString(data_x, data_start_y - 37*mm, t['mounting_angle'])
     mounting_str = f"{offset_angle:.3f}°"
     c.drawString(data_x + 40*mm, data_start_y - 37*mm, mounting_str)
     mounting_width = c.stringWidth(mounting_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(data_x + 40*mm + mounting_width + 1.5*mm, data_start_y - 37*mm, f"(cartridge to arm)")
+    c.drawString(data_x + 40*mm + mounting_width + 1.5*mm, data_start_y - 37*mm, t['mounting_angle_note'])
     c.setFont("Helvetica", 9)
     
-    c.drawString(data_x, data_start_y - 42*mm, f"Offset Angle:")
+    c.drawString(data_x, data_start_y - 42*mm, t['offset_angle'])
     offset_str = f"{tracking_angle_midpoint:.3f}°"
     c.drawString(data_x + 40*mm, data_start_y - 42*mm, offset_str)
     offset_width = c.stringWidth(offset_str, "Helvetica", 9)
     c.setFont("Helvetica", 7)
-    c.drawString(data_x + 40*mm + offset_width + 1.5*mm, data_start_y - 42*mm, f"(at midpoint)")
+    c.drawString(data_x + 40*mm + offset_width + 1.5*mm, data_start_y - 42*mm, t['offset_angle_note'])
     c.setFont("Helvetica", 9)
     
     # Scale verification at BOTTOM LEFT (below data section)
@@ -396,7 +444,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     
     # Verification text - 5mm above scale bar
     c.setFont("Helvetica", 9)
-    c.drawString(scale_x, scale_y + 5*mm, "Scale verification. This bar must measure exactly:")
+    c.drawString(scale_x, scale_y + 5*mm, t['scale_verification'])
     
     # 100mm scale bar
     c.setStrokeColorRGB(0, 0, 0)
@@ -423,7 +471,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     # Spindle label - vertically centered on spindle center
     c.setFont("Helvetica-Bold", 9)
     # Font size 9 has approximately 3.2mm height, so offset by half to center
-    c.drawString(6*mm, -1.6*mm, "Spindle")
+    c.drawString(6*mm, -1.6*mm, t['spindle'])
     
     # Calculate pivot point position - RIGHT side for normal turntables
     pivot_x = pivot_to_spindle * mm  # POSITIVE = to the right
@@ -433,7 +481,7 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.setStrokeColorRGB(0, 0, 0)  # Black (was red)
     c.circle(pivot_x, pivot_y, 2*mm, stroke=1, fill=0)
     c.setFont("Helvetica-Bold", 8)
-    c.drawString(pivot_x + 4*mm, pivot_y + 4*mm, "PIVOT")
+    c.drawString(pivot_x + 4*mm, pivot_y + 4*mm, t['pivot'])
     c.setFont("Helvetica", 7)
     c.drawString(pivot_x + 4*mm, pivot_y - 5*mm, f"{pivot_to_spindle:.1f}mm")
     
@@ -563,8 +611,8 @@ def draw_arc_protractor(pivot_to_spindle, alignment='baerwald',
     c.line(0, 0, x_outer, y_outer)
     
     # Draw grids at both null points (AFTER radius lines so they stay black)
-    draw_alignment_grid(inner_null, "Inner Null Point")
-    draw_alignment_grid(outer_null, "Outer Null Point")
+    draw_alignment_grid(inner_null, t['inner_null_label'])
+    draw_alignment_grid(outer_null, t['outer_null_label'])
     
     # Draw arc LAST so it's visible on top of everything
     # Arc should START 4cm above inner null (closer to spindle)
@@ -722,6 +770,11 @@ Common tonearm mounting distances:
                        default='A4',
                        help='Paper size: A4 (210x297mm) or US/letter (8.5x11in) (default: A4)')
     
+    parser.add_argument('--language',
+                       choices=['en', 'pt'],
+                       default='en',
+                       help='Language for labels: en (English) or pt (Portuguese) (default: en)')
+    
     args = parser.parse_args()
     
     # Show all alignments if requested
@@ -750,7 +803,8 @@ Common tonearm mounting distances:
             inner_groove=args.inner_groove,
             outer_groove=args.outer_groove,
             custom_name=args.name,
-            papersize=args.papersize
+            papersize=args.papersize,
+            language=args.language
         )
         
         print(f"\n✓ Protractor generated successfully!")

@@ -1,5 +1,6 @@
 <p>Este formulário gera gabaritos de alinhamento de arco de precisão para o alinhamento de cápsulas fonográficas em toca-discos com braços pivotantes. Basta medir a distância pivot-spindle do seu toca-discos, inserir o valor e quaisquer outras configurações desejadas no formulário, clicar em "Gerar Gabarito" e imprimir seu PDF personalizado em escala de 100%.</p>
 <div class="protractor-form"><form id="protractorForm">
+<input type="hidden" name="language" id="language" value="pt">
 <div class="form-group"><label for="pivot_distance">Distância Pivot-Spindle (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.001" type="number" placeholder="ex: 215.5"> <small>Meça do pivot do braço até o centro do spindle</small></div>
 <div class="form-group"><label for="alignment">Geometria de Alinhamento</label><select id="alignment" name="alignment">
 <option value="baerwald">Baerwald (Löfgren A)</option>
@@ -9,9 +10,11 @@
 </select><small>Baerwald: melhor uso geral | Löfgren B: audição de lado completo | Stevenson: foco em sulcos internos</small></div>
 <div class="form-group"><label for="inner_null">Ponto Nulo Interno (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.001" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
 <div class="form-group"><label for="outer_null">Ponto Nulo Externo (mm)</label> <input id="outer_null" max="160" min="40" name="outer_null" step="0.001" type="number"> <small>Calculado automaticamente (editável - editar muda para alinhamento Personalizado)</small></div>
-<div class="form-group"><label>Padrão de Sulcos</label> <small>Selecione o padrão ou escolha Personalizado para inserir seus próprios valores</small>
-<div class="radio-group"><label><input checked="checked" name="groove_standard" type="radio" value="iec"> IEC/RIAA (60.325-146.05mm)</label> <label><input name="groove_standard" type="radio" value="din"> DIN (57.5-146.05mm)</label> <label><input name="groove_standard" type="radio" value="custom"> Personalizado</label></div>
-</div>
+<div class="form-group"><label for="groove_standard">Padrão de Sulcos</label><select id="groove_standard" name="groove_standard">
+<option selected="selected" value="iec">IEC/RIAA (60.325-146.05mm)</option>
+<option value="din">DIN (57.5-146.05mm)</option>
+<option value="custom">Personalizado</option>
+</select><small>Selecione o padrão ou escolha Personalizado para inserir seus próprios valores</small></div>
 <div class="form-group"><label for="inner_groove">Raio de Sulco Interno (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.001" type="number" value="60.325"> <small>Preenchido automaticamente pela seleção de padrão (editável)</small></div>
 <div class="form-group"><label for="outer_groove">Raio de Sulco Externo (mm)</label> <input id="outer_groove" max="160" min="70" name="outer_groove" required="" step="0.001" type="number" value="146.05"> <small>Preenchido automaticamente pela seleção de padrão (editável)</small></div>
 <div class="form-group"><label for="turntable_name">Nome do Toca-Discos (opcional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="ex: SME 3009 S2 Improved"> <small>Aparecerá no gabarito</small></div>

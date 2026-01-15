@@ -39,6 +39,11 @@ $pivot_distance = filter_var($_POST['pivot_distance'], FILTER_VALIDATE_FLOAT);
 $alignment = isset($_POST['alignment']) ? $_POST['alignment'] : 'baerwald';
 $turntable_name = isset($_POST['turntable_name']) ? $_POST['turntable_name'] : '';
 $paper_size = isset($_POST['paper_size']) ? $_POST['paper_size'] : 'A4';
+$language = isset($_POST['language']) ? $_POST['language'] : 'en';
+
+// Debug: log the received language (remove this after testing)
+error_log("Received language parameter: " . $language);
+
 $inner_groove = isset($_POST['inner_groove']) ? filter_var($_POST['inner_groove'], FILTER_VALIDATE_FLOAT) : null;
 $outer_groove = isset($_POST['outer_groove']) ? filter_var($_POST['outer_groove'], FILTER_VALIDATE_FLOAT) : null;
 $inner_null = isset($_POST['inner_null']) ? filter_var($_POST['inner_null'], FILTER_VALIDATE_FLOAT) : null;
@@ -67,6 +72,15 @@ if (!in_array($paper_size, $valid_paper_sizes)) {
     http_response_code(400);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Invalid paper size']);
+    exit;
+}
+
+// Validate language
+$valid_languages = ['en', 'pt'];
+if (!in_array($language, $valid_languages)) {
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Invalid language']);
     exit;
 }
 
@@ -166,6 +180,7 @@ if ($alignment === 'custom') {
 }
 
 $command .= ' --papersize ' . escapeshellarg($paper_size);
+$command .= ' --language ' . escapeshellarg($language);
 $command .= ' -o ' . escapeshellarg($output_filename);
 
 if (!empty($turntable_name)) {

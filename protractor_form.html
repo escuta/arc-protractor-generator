@@ -1,5 +1,6 @@
 <p>This form generates precision arc protractors for aligning phono cartridges on turntables with pivoting tonearms. Simply measure your turntable's pivot-to-spindle distance, enter the value and any other desired settings in the form, click "Generate Protractor", and print your custom protractor PDF at 100% scale.</p>
 <div class="protractor-form"><form id="protractorForm">
+<input type="hidden" name="language" id="language" value="en">
 <div class="form-group"><label for="pivot_distance">Pivot-to-Spindle Distance (mm) *</label> <input id="pivot_distance" max="300" min="150" name="pivot_distance" required="" step="0.001" type="number" placeholder="e.g., 215.5"> <small>Measure from tonearm pivot to spindle centre</small></div>
 <div class="form-group"><label for="alignment">Alignment Geometry</label><select id="alignment" name="alignment">
 <option value="baerwald">Baerwald (Löfgren A)</option>
@@ -9,9 +10,11 @@
 </select><small>Baerwald: best all-round | Löfgren B: full-side listening | Stevenson: inner groove focus</small></div>
 <div class="form-group"><label for="inner_null">Inner Null Point (mm)</label> <input id="inner_null" max="100" min="40" name="inner_null" step="0.001" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
 <div class="form-group"><label for="outer_null">Outer Null Point (mm)</label> <input id="outer_null" max="160" min="40" name="outer_null" step="0.001" type="number"> <small>Auto-calculated (editable - editing switches to Custom alignment)</small></div>
-<div class="form-group"><label>Groove Standard</label> <small>Select standard or choose Custom to enter your own values</small>
-<div class="radio-group"><label><input checked="checked" name="groove_standard" type="radio" value="iec"> IEC/RIAA (60.325-146.05mm)</label> <label><input name="groove_standard" type="radio" value="din"> DIN (57.5-146.05mm)</label> <label><input name="groove_standard" type="radio" value="custom"> Custom</label></div>
-</div>
+<div class="form-group"><label for="groove_standard">Groove Standard</label><select id="groove_standard" name="groove_standard">
+<option selected="selected" value="iec">IEC/RIAA (60.325-146.05mm)</option>
+<option value="din">DIN (57.5-146.05mm)</option>
+<option value="custom">Custom</option>
+</select><small>Select standard or choose Custom to enter your own values</small></div>
 <div class="form-group"><label for="inner_groove">Inner Groove Radius (mm)</label> <input id="inner_groove" max="100" min="40" name="inner_groove" required="" step="0.001" type="number" value="60.325"> <small>Auto-filled by standard selection (editable)</small></div>
 <div class="form-group"><label for="outer_groove">Outer Groove Radius (mm)</label> <input id="outer_groove" max="160" min="70" name="outer_groove" required="" step="0.001" type="number" value="146.05"> <small>Auto-filled by standard selection (editable)</small></div>
 <div class="form-group"><label for="turntable_name">Turntable Name (optional)</label> <input id="turntable_name" name="turntable_name" type="text" placeholder="e.g., SME 3009 S2 Improved"> <small>Will appear on the alignment protractor</small></div>
